@@ -96,6 +96,9 @@ img = pygame.Surface((20, 20))
 img.fill(white)
 pygame.draw.polygon(img, grey, ((5, 20), (10, 0), (15, 20)))
 
+enemy_img = pygame.image.load('enemy1.png')
+robot_img = pygame.image.load('robot1.png')
+
 bullet_img = pygame.Surface((3, 3))
 bullet_img.fill(black)
 
@@ -111,6 +114,7 @@ class Sprite:
         self.direction = direction
         self.move_size = 20
         self.img = sprite_image
+        self.original_img = sprite_image
         self.velocity = velocity
         self.hit_wall = False
         self.dead = False
@@ -118,7 +122,7 @@ class Sprite:
     def rotate(self, angle):
         self.direction += angle
         self.direction = self.direction % 360
-        self.img = pygame.transform.rotate(img, -self.direction)
+        self.img = pygame.transform.rotate(self.original_img, -self.direction)
     def move_forward(self, up_down=1):
         self.move_forward_by(up_down * self.move_size)
     def move_forward_by(self, move_distance):
@@ -217,16 +221,16 @@ def game_loop():
 
     start_game()
 
-    robot = Sprite(game_environment)
+    robot = Sprite(game_environment, sprite_image=robot_img)
     game_environment.robots = [robot]
 
-    enemy = Sprite(game_environment, 400, 400)
+    enemy = Sprite(game_environment, 400, 400, sprite_image=enemy_img)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 200, 100)
+    enemy = Sprite(game_environment, 200, 100, sprite_image=enemy_img)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 300, 100)
+    enemy = Sprite(game_environment, 300, 100, sprite_image=enemy_img)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 500, 200)
+    enemy = Sprite(game_environment, 500, 200, sprite_image=enemy_img)
     game_environment.enemies.append(enemy)
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
