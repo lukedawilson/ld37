@@ -1,4 +1,4 @@
-import pygame, random, sys
+import pygame, random, sys, math
 from pygame.locals import *
 
 def die(score):
@@ -155,8 +155,19 @@ class GameEnvironment:
             if not bullet.hit_wall:
                 new_bullets.append(bullet)
         self.bullets = new_bullets
-    def update_enemy_position(self):
-        return
+    def update_enemy_positions(self):
+        robot_position = [0,0]
+        for robot in self.robots:
+            robot_position[0] += robot.position[0]
+            robot_position[1] += robot.position[1]
+        robot_position[0] /= len(self.robots)
+        robot_position[1] /= len(self.robots)
+        for i, enemy in enumerate(self.enemies):
+            length = math.sqrt(((robot_position[0] - enemy.position[0]) ** 2) + ((robot_position[1] - enemy.position[1]) ** 2))
+            enemy_to_robot = [float(robot_position[0] - enemy.position[0]) / length , float(robot_position[1] - enemy.position[1]) / length]
+            self.enemies[i].position[0] += enemy_to_robot[0]
+            self.enemies[i].position[1] += enemy_to_robot[1]
+
 
 def game_loop():
 
@@ -177,7 +188,13 @@ def game_loop():
     game_environment.robots = [robot]
 
     enemy = Sprite(game_environment, 400, 400)
-    game_environment.enemies = [enemy]
+    game_environment.enemies.append(enemy)
+    enemy = Sprite(game_environment, 200, 100)
+    game_environment.enemies.append(enemy)
+    enemy = Sprite(game_environment, 300, 100)
+    game_environment.enemies.append(enemy)
+    enemy = Sprite(game_environment, 500, 200)
+    game_environment.enemies.append(enemy)
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
 
