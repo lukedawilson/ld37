@@ -112,7 +112,7 @@ class Sprite:
         self.move_size = 20
         self.img = sprite_image
         self.velocity = velocity
-        #self.s = s
+        self.hit_wall = False
     def rotate(self, angle):
         self.direction += angle
         self.direction = self.direction % 360
@@ -128,8 +128,14 @@ class Sprite:
             self.position[1] += move_distance
         elif self.direction == 270:
             self.position[0] -= move_distance
-        self.position[0] = max(0, min(screen_w - 20, self.position[0]))
-        self.position[1] = max(0, min(screen_h - 20, self.position[1]))
+        self.check_for_walls()
+    def check_for_walls(self):
+        if (self.position[0] < 0) or (self.position[0] > screen_w - 20):
+            self.position[0] = max(0, min(screen_w - 20, self.position[0]))
+            self.hit_wall = True
+        if (self.position[1] < 0) or (self.position[1] > screen_h - 20):
+            self.position[1] = max(0, min(screen_h - 20, self.position[1]))
+            self.hit_wall = True
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
     def shoot(self, velocity = 20):
@@ -141,6 +147,12 @@ class GameEnvironment:
     def __init__(self):
         self.sprites = []
         self.bullets = []
+    def clean_up_bullets(self):
+        new_bullets = []
+        for bullet in self.bullets:
+            if not bullet.hit_wall:
+                new_bullets.append(bullet)
+        self.bullets = new_bullets
 
 def game_loop():
 
@@ -201,6 +213,8 @@ def game_loop():
             s.blit(bullet.img, bullet.position)
         for sprite in game_environment.sprites:
             s.blit(sprite.img, sprite.position)
+
+        game_environment.clean_up_bullets()
 
 
         pygame.display.update()
