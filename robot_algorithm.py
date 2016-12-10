@@ -12,7 +12,7 @@ class RobotAlgorithm:
         self.i = 0
         
     def run_next_command(self):
-        if self.i == len(self.program):
+        if self.i >= len(self.program):
             self.i = 0   
     
         statement = filter(None, self.program[self.i].split(' '))
@@ -20,15 +20,15 @@ class RobotAlgorithm:
         arg = statement[1] if len(statement) > 1 else ''     
         skip = int(statement[2]) if len(statement) > 2 else 0
         
-        while cmd == 'if' or cmd == 'end':
-            if cmd == 'if':
-                passed = self.__evaluate(arg)
-                if passed == False:
-                    self.i = self.i + skip
+        while cmd == 'if':
+            passed = self.__evaluate(arg)
+            if passed == False:
+                self.i = self.i + skip
                 
-                self.i = self.i + 1
-            elif cmd == 'end':
-                self.i = self.i + 1
+            self.i = self.i + 1
+            if self.i >= len(self.program):
+                cmd = None
+                break
                 
             statement = filter(None, self.program[self.i].split(' '))
             cmd = statement[0]
