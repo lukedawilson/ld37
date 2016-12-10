@@ -1,7 +1,7 @@
 import pygame, random, sys, math
 from pygame.locals import *
 
-def die(score):
+def die(score = 0):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
     message_to_screen('Your score was: '+str(score)+', press space to play again, q to quit', black)
     while True:
@@ -105,7 +105,7 @@ bullet_img.fill(black)
 
 
 class Sprite:
-    def __init__(self, game_environment, x_position=250, y_position=250, direction=0, velocity=0, sprite_image = img):
+    def __init__(self, game_environment, x_position=250, y_position=250, direction=0, velocity=0, sprite_image = img, sprite_size=20):
         self.game_environment = game_environment
         self.position = [x_position, y_position]
         self.direction = direction
@@ -113,6 +113,8 @@ class Sprite:
         self.img = sprite_image
         self.velocity = velocity
         self.hit_wall = False
+        self.dead = False
+        self.sprite_size = sprite_size
     def rotate(self, angle):
         self.direction += angle
         self.direction = self.direction % 360
@@ -130,16 +132,16 @@ class Sprite:
             self.position[0] -= move_distance
         self.check_for_walls()
     def check_for_walls(self):
-        if (self.position[0] < 0) or (self.position[0] > screen_w - 20):
-            self.position[0] = max(0, min(screen_w - 20, self.position[0]))
+        if (self.position[0] < 0) or (self.position[0] > screen_w - self.sprite_size):
+            self.position[0] = max(0, min(screen_w - self.sprite_size, self.position[0]))
             self.hit_wall = True
-        if (self.position[1] < 0) or (self.position[1] > screen_h - 20):
-            self.position[1] = max(0, min(screen_h - 20, self.position[1]))
+        if (self.position[1] < 0) or (self.position[1] > screen_h - self.sprite_size):
+            self.position[1] = max(0, min(screen_h - self.sprite_size, self.position[1]))
             self.hit_wall = True
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
     def shoot(self, velocity = 20):
-        new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10, y_position=self.position[1] + 10, direction=self.direction, velocity=velocity, sprite_image = bullet_img)
+        new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10, y_position=self.position[1] + 10, direction=self.direction, velocity=velocity, sprite_image = bullet_img, sprite_size=3)
         self.game_environment.bullets.append(new_bullet)
 
 
@@ -149,12 +151,43 @@ class GameEnvironment:
         self.robots = []
         self.bullets = []
         self.enemies = []
+    def clean_up_bullets_and_dead(self):
+        self.mark_dead()
+        self.clean_up_bullets()
+        self.clean_up_enemies()
+        self.clean_up_robots()
+        if len(self.robots) == 0:
+            die()
+    def mark_dead(self):
+        for i, bullet in enumerate(self.bullets):
+            for j, enemy in enumerate(self.enemies):
+                if (enemy.position[0] - 2 <= bullet.position[0] <= enemy.position[0] + 19) and \
+                    (enemy.position[1] - 2 <= bullet.position[1] <= enemy.position[1] + 19):
+                    self.bullets[i].dead = True
+                    self.enemies[j].dead = True
+        for j, enemy in enumerate(self.enemies):
+            for k, robot in enumerate(self.robots):
+                if (enemy.position[0] - 10 <= robot.position[0] <= enemy.position[0] + 10) and \
+                    (enemy.position[1] - 10 <= robot.position[1] <= enemy.position[1] + 10):
+                    self.robots[k].dead = True
     def clean_up_bullets(self):
         new_bullets = []
         for bullet in self.bullets:
-            if not bullet.hit_wall:
+            if (not bullet.hit_wall and not bullet.dead):
                 new_bullets.append(bullet)
         self.bullets = new_bullets
+    def clean_up_enemies(self):
+        new_enemies = []
+        for enemy in self.enemies:
+            if not enemy.dead:
+                new_enemies.append(enemy)
+        self.enemies = new_enemies
+    def clean_up_robots(self):
+        new_robots = []
+        for robot in self.robots:
+            if not robot.dead:
+                new_robots.append(robot)
+        self.robots = new_robots
     def update_enemy_positions(self):
         robot_position = [0,0]
         for robot in self.robots:
@@ -240,7 +273,7 @@ def game_loop():
         for enemy in game_environment.enemies:
             s.blit(enemy.img, enemy.position)
 
-        game_environment.clean_up_bullets()
+        game_environment.clean_up_bullets_and_dead()
 
 
         pygame.display.update()
