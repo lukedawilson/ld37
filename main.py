@@ -96,10 +96,51 @@ img = pygame.Surface((20, 20))
 img.fill(white)
 pygame.draw.polygon(img, grey, ((5, 20), (10, 0), (15, 20)))
 
+bullet_img = pygame.Surface((3, 3))
+bullet_img.fill(black)
+
+
 
 ## skier_c = pygame.image.load('skier_c.png')
 
 
+class Sprite:
+    def __init__(self, game_environment, x_position=250, y_position=250, direction=0, velocity=0, sprite_image = img):
+        self.game_environment = game_environment
+        self.position = [x_position, y_position]
+        self.direction = direction
+        self.move_size = 20
+        self.img = sprite_image
+        self.velocity = velocity
+        #self.s = s
+    def rotate(self, angle):
+        self.direction += angle
+        self.direction = self.direction % 360
+        self.img = pygame.transform.rotate(img, -self.direction)
+    def move_forward(self, up_down=1):
+        self.move_forward_by(up_down * self.move_size)
+    def move_forward_by(self, move_distance):
+        if self.direction == 0:
+            self.position[1] -= move_distance
+        elif self.direction == 90:
+            self.position[0] += move_distance
+        elif self.direction == 180:
+            self.position[1] += move_distance
+        elif self.direction == 270:
+            self.position[0] -= move_distance
+        self.position[0] = max(0, min(screen_w - 20, self.position[0]))
+        self.position[1] = max(0, min(screen_h - 20, self.position[1]))
+    def update_for_velocity(self):
+        self.move_forward_by(self.velocity)
+    def shoot(self, velocity = 20):
+        new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10, y_position=self.position[1] + 10, direction=self.direction, velocity=velocity, sprite_image = bullet_img)
+        self.game_environment.bullets.append(new_bullet)
+
+
+class GameEnvironment:
+    def __init__(self):
+        self.sprites = []
+        self.bullets = []
 
 def game_loop():
 
@@ -107,7 +148,7 @@ def game_loop():
 
     run_game = True
     fps = 30
-
+    game_environment = GameEnvironment()
 
 
 
@@ -116,10 +157,10 @@ def game_loop():
 
     start_game()
 
-    rotate, forward = 0, 0
-    move_size = 20
-    position = [250, 250]
-    direction = 0
+    robot = Sprite(game_environment)
+    game_environment.sprites = [robot]
+
+    up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
 
 
     while run_game:
@@ -130,37 +171,36 @@ def game_loop():
                 run_game = False
             elif e.type == KEYDOWN:
                 if e.key == K_RIGHT:
-                    rotate += 90
+                    robot.rotate(90)
                 elif e.key == K_LEFT:
-                    rotate -= 90
+                    robot.rotate(-90)
                 elif e.key == K_UP:
-                    forward += move_size
+                    up_down += 1
                 elif e.key == K_DOWN:
-                    forward -= move_size
+                    up_down -= 1
+                elif e.key == K_SPACE:
+                    robot.shoot()
                 elif e.key == K_p:
                     pause()
             elif e.type == KEYUP:
                 if e.key == K_UP:
-                    forward -= move_size
+                    up_down -= 1
                 elif e.key == K_DOWN:
-                    forward += move_size
+                    up_down += 1
 
-        direction -= rotate
         rotate = 0
-        direction = direction % 360
-        if direction == 0:
-            position[1] -= forward
-        elif direction == 90:
-            position[0] -= forward
-        elif direction == 180:
-            position[1] += forward
-        elif direction == 270:
-            position[0] += forward
+
+        robot.rotate(rotate)
+        robot.move_forward(up_down)
+
+
 
         s.fill(white)
-        #message_to_screen('position, forward, rotate, direction' + str(position[0]) + '-' + str(position[1]) + ', ' + str(forward) + ', ' + str(rotate) + ' ' + str(direction), green, -170, 'small')
-        robot = pygame.transform.rotate(img, direction)
-        s.blit(robot, position)
+        for bullet in game_environment.bullets:
+            bullet.update_for_velocity()
+            s.blit(bullet.img, bullet.position)
+        for sprite in game_environment.sprites:
+            s.blit(sprite.img, sprite.position)
 
 
         pygame.display.update()
