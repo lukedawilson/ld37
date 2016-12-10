@@ -16,7 +16,7 @@ class Robot:
         return False
         
     def enemy_front(self):
-        return True
+        return False
         
     def wall_front(self):
         return False
