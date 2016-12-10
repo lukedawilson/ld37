@@ -10,16 +10,16 @@ class Robot:
         print 'Shoot at ' + str(velocity) + ' velocity'
         
     def enemy_left(self):
-        return true
+        return True
         
     def enemy_right(self):
-        return false;
+        return False
         
     def enemy_front(self):
-        return true
+        return True
         
     def wall_front(self):
-        return false
+        return False
         
     def dead(self):
-        return false
+        return False
