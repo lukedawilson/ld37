@@ -1,5 +1,5 @@
 import switch
-from robot import Robot
+from robot import Sprite
 
 class RobotAlgorithm:
     def __init__(self, robot, raw_program):

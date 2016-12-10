@@ -1,5 +1,42 @@
 import pygame, random, sys, math
 from pygame.locals import *
+from robot_algorithm import *
+from robot import Sprite
+
+input = """
+fd
+fd
+sh
+rr
+fd
+sh
+sh
+fd
+rl
+sh
+rl
+sh
+"""
+
+input2 = """
+if el
+    rl
+    if ef
+        sh
+    end
+    fd
+end
+if er
+    rr
+    sh
+end
+if ef
+    sh
+end
+sh
+fd
+"""
+
 
 def die(score = 0):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
@@ -107,47 +144,6 @@ bullet_img.fill(black)
 ## skier_c = pygame.image.load('skier_c.png')
 
 
-class Sprite:
-    def __init__(self, game_environment, x_position=250, y_position=250, direction=0, velocity=0, sprite_image = img, sprite_size=20):
-        self.game_environment = game_environment
-        self.position = [x_position, y_position]
-        self.direction = direction
-        self.move_size = 20
-        self.img = sprite_image
-        self.original_img = sprite_image
-        self.velocity = velocity
-        self.hit_wall = False
-        self.dead = False
-        self.sprite_size = sprite_size
-    def rotate(self, angle):
-        self.direction += angle
-        self.direction = self.direction % 360
-        self.img = pygame.transform.rotate(self.original_img, -self.direction)
-    def move_forward(self, up_down=1):
-        self.move_forward_by(up_down * self.move_size)
-    def move_forward_by(self, move_distance):
-        if self.direction == 0:
-            self.position[1] -= move_distance
-        elif self.direction == 90:
-            self.position[0] += move_distance
-        elif self.direction == 180:
-            self.position[1] += move_distance
-        elif self.direction == 270:
-            self.position[0] -= move_distance
-        self.check_for_walls()
-    def check_for_walls(self):
-        if (self.position[0] < 0) or (self.position[0] > screen_w - self.sprite_size):
-            self.position[0] = max(0, min(screen_w - self.sprite_size, self.position[0]))
-            self.hit_wall = True
-        if (self.position[1] < 0) or (self.position[1] > screen_h - self.sprite_size):
-            self.position[1] = max(0, min(screen_h - self.sprite_size, self.position[1]))
-            self.hit_wall = True
-    def update_for_velocity(self):
-        self.move_forward_by(self.velocity)
-    def shoot(self, velocity = 20):
-        new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10, y_position=self.position[1] + 10, direction=self.direction, velocity=velocity, sprite_image = bullet_img, sprite_size=3)
-        self.game_environment.bullets.append(new_bullet)
-
 
 
 class GameEnvironment:
@@ -221,16 +217,20 @@ def game_loop():
 
     start_game()
 
+
+
     robot = Sprite(game_environment, sprite_image=robot_img)
     game_environment.robots = [robot]
 
-    enemy = Sprite(game_environment, 400, 400, sprite_image=enemy_img)
+    algo = RobotAlgorithm(robot, input)
+
+    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=400, y_position=400)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 200, 100, sprite_image=enemy_img)
+    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=200, y_position=100)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 300, 100, sprite_image=enemy_img)
+    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=300, y_position=100)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, 500, 200, sprite_image=enemy_img)
+    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=500, y_position=200)
     game_environment.enemies.append(enemy)
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
@@ -243,28 +243,29 @@ def game_loop():
             if e.type == QUIT:
                 run_game = False
             elif e.type == KEYDOWN:
-                if e.key == K_RIGHT:
-                    robot.rotate(90)
-                elif e.key == K_LEFT:
-                    robot.rotate(-90)
-                elif e.key == K_UP:
-                    up_down += 1
-                elif e.key == K_DOWN:
-                    up_down -= 1
-                elif e.key == K_SPACE:
-                    robot.shoot()
-                elif e.key == K_p:
+            #     if e.key == K_RIGHT:
+            #         robot.rotate(90)
+            #     elif e.key == K_LEFT:
+            #         robot.rotate(-90)
+            #     elif e.key == K_UP:
+            #         up_down += 1
+            #     elif e.key == K_DOWN:
+            #         up_down -= 1
+            #     elif e.key == K_SPACE:
+            #         robot.shoot()
+                if e.key == K_p:
                     pause()
-            elif e.type == KEYUP:
-                if e.key == K_UP:
-                    up_down -= 1
-                elif e.key == K_DOWN:
-                    up_down += 1
+            # elif e.type == KEYUP:
+            #     if e.key == K_UP:
+            #         up_down -= 1
+            #     elif e.key == K_DOWN:
+            #         up_down += 1
 
         rotate = 0
 
-        robot.rotate(rotate)
-        robot.move_forward(up_down)
+        algo.run_next_command()
+        #robot.rotate(rotate)
+        #robot.move_forward(up_down)
 
         game_environment.update_enemy_positions()
 
