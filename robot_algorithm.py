@@ -9,8 +9,3 @@ class RobotAlgorithm:
         self.robot.rotate(-90)
         #self.robot.move_forward(1)
         #self.robot.shoot(15)
-
-# Example usage
-robot = Robot()
-algo = RobotAlgorithm(robot)
-algo.run_next_command()
