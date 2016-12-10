@@ -143,16 +143,20 @@ class Sprite:
         self.game_environment.bullets.append(new_bullet)
 
 
+
 class GameEnvironment:
     def __init__(self):
-        self.sprites = []
+        self.robots = []
         self.bullets = []
+        self.enemies = []
     def clean_up_bullets(self):
         new_bullets = []
         for bullet in self.bullets:
             if not bullet.hit_wall:
                 new_bullets.append(bullet)
         self.bullets = new_bullets
+    def update_enemy_position(self):
+        return
 
 def game_loop():
 
@@ -170,7 +174,10 @@ def game_loop():
     start_game()
 
     robot = Sprite(game_environment)
-    game_environment.sprites = [robot]
+    game_environment.robots = [robot]
+
+    enemy = Sprite(game_environment, 400, 400)
+    game_environment.enemies = [enemy]
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
 
@@ -205,14 +212,16 @@ def game_loop():
         robot.rotate(rotate)
         robot.move_forward(up_down)
 
-
+        game_environment.update_enemy_positions()
 
         s.fill(white)
         for bullet in game_environment.bullets:
             bullet.update_for_velocity()
             s.blit(bullet.img, bullet.position)
-        for sprite in game_environment.sprites:
-            s.blit(sprite.img, sprite.position)
+        for robot in game_environment.robots:
+            s.blit(robot.img, robot.position)
+        for enemy in game_environment.enemies:
+            s.blit(enemy.img, enemy.position)
 
         game_environment.clean_up_bullets()
 
