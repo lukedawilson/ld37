@@ -4,7 +4,7 @@ class Robot:
         print 'Rotate ' + str(angle) + ' degrees'
         
     def move_forward(self, direction=1): # 1=forward, -1=backwards, 0=sit on yer arse
-        print 'Moved in the ' + str(direction) + ' direction'    
+        print 'Move ' + ('forwards' if 1 else ('backwards' if -1 else 'nowhere'))
         
     def shoot(self, velocity=10):
         print 'Shoot at ' + str(velocity) + ' velocity'
