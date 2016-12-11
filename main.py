@@ -145,8 +145,9 @@ red = (255, 0, 0)
 blue = (0, 0, 255)
 green = (0, 155, 0)
 grey = (100, 100, 100)
+yellow = (250, 250, 0)
 screen_w, screen_h = 800, 600
-number_of_robots = 4
+top_bottom_buffer, side_buffer, border_thickness = 50, 5, 3
 
 pygame.init()
 s = pygame.display.set_mode((screen_w, screen_h))
@@ -304,8 +305,8 @@ def game_level(level, no_of_robots):
     for i in range(level + 5):
         rand_x = random.random()
         rand_y = random.random()
-        x_start_position = rand_x * (screen_w - 20)
-        y_start_position = rand_y * (screen_h - 20)
+        x_start_position = rand_x * (screen_w - 20 - side_buffer * 2) + side_buffer
+        y_start_position = rand_y * (screen_h - 20 - top_bottom_buffer * 2) + top_bottom_buffer
         enemy = Sprite(game_environment, type='enemy', x_position=x_start_position, y_position=y_start_position)
         game_environment.enemies.append(enemy)
 
@@ -354,6 +355,10 @@ def game_level(level, no_of_robots):
         game_environment.update_enemy_positions()
 
         s.fill(black)
+        pygame.draw.line(s, yellow, (side_buffer, top_bottom_buffer), (screen_w - side_buffer, top_bottom_buffer), border_thickness)
+        pygame.draw.line(s, yellow, (screen_w - side_buffer, top_bottom_buffer), (screen_w - side_buffer, screen_h - top_bottom_buffer), border_thickness)
+        pygame.draw.line(s, yellow, (screen_w - side_buffer, screen_h - top_bottom_buffer), (side_buffer, screen_h - top_bottom_buffer), border_thickness)
+        pygame.draw.line(s, yellow, (side_buffer, screen_h - top_bottom_buffer), (side_buffer, top_bottom_buffer), border_thickness)
         for bullet in game_environment.bullets:
             bullet.update_for_velocity()
             s.blit(bullet.img, bullet.position)

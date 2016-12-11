@@ -106,11 +106,11 @@ class Sprite:
             self.position[0] -= move_distance
         self.check_for_walls()
     def check_for_walls(self):
-        if (self.position[0] < 0) or (self.position[0] > screen_w - self.sprite_size):
-            self.position[0] = max(0, min(screen_w - self.sprite_size, self.position[0]))
+        if (self.position[0] < 5) or (self.position[0] > screen_w - self.sprite_size - 5):
+            self.position[0] = max(5, min(screen_w - self.sprite_size - 5, self.position[0]))
             self.hit_wall = True
-        if (self.position[1] < 0) or (self.position[1] > screen_h - self.sprite_size):
-            self.position[1] = max(0, min(screen_h - self.sprite_size, self.position[1]))
+        if (self.position[1] < 50) or (self.position[1] > screen_h - self.sprite_size - 50):
+            self.position[1] = max(50, min(screen_h - self.sprite_size - 50, self.position[1]))
             self.hit_wall = True
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
