@@ -6,25 +6,90 @@ black = (0, 0, 0)
 bullet_img = pygame.Surface((3, 3))
 bullet_img.fill(black)
 
+images = {'robot': {0:{}, 90:{}, 180:{}, 270:{}}, 'enemy': {0:{}, 90:{}, 180:{}, 270:{}}}
+
+images['robot'][180][0] = pygame.image.load('sprites/robot1.png')
+images['robot'][180][1] = pygame.image.load('sprites/robot2.png')
+images['robot'][180][2] = pygame.image.load('sprites/robot1.png')
+images['robot'][180][3] = pygame.image.load('sprites/robot3.png')
+images['robot'][0][0] = pygame.image.load('sprites/robot_back1.png')
+images['robot'][0][1] = pygame.image.load('sprites/robot_back2.png')
+images['robot'][0][2] = pygame.image.load('sprites/robot_back1.png')
+images['robot'][0][3] = pygame.image.load('sprites/robot_back3.png')
+images['robot'][270][0] = pygame.image.load('sprites/robot_left.png')
+images['robot'][270][1] = pygame.image.load('sprites/robot_left.png')
+images['robot'][270][2] = pygame.image.load('sprites/robot_left2.png')
+images['robot'][270][3] = pygame.image.load('sprites/robot_left2.png')
+images['robot'][90][0] = pygame.image.load('sprites/robot_right.png')
+images['robot'][90][1] = pygame.image.load('sprites/robot_right.png')
+images['robot'][90][2] = pygame.image.load('sprites/robot_right2.png')
+images['robot'][90][3] = pygame.image.load('sprites/robot_right2.png')
+
+images['enemy'][180][0] = pygame.image.load('sprites/enemy1.png')
+images['enemy'][180][1] = pygame.image.load('sprites/enemy2.png')
+images['enemy'][180][2] = pygame.image.load('sprites/enemy1.png')
+images['enemy'][180][3] = pygame.image.load('sprites/enemy3.png')
+images['enemy'][0][0] = pygame.image.load('sprites/enemy_back1.png')
+images['enemy'][0][1] = pygame.image.load('sprites/enemy_back2.png')
+images['enemy'][0][2] = pygame.image.load('sprites/enemy_back1.png')
+images['enemy'][0][3] = pygame.image.load('sprites/enemy_back3.png')
+images['enemy'][270][0] = pygame.image.load('sprites/enemy_left.png')
+images['enemy'][270][1] = pygame.image.load('sprites/enemy_left.png')
+images['enemy'][270][2] = pygame.image.load('sprites/enemy_left2.png')
+images['enemy'][270][3] = pygame.image.load('sprites/enemy_left2.png')
+images['enemy'][90][0] = pygame.image.load('sprites/enemy_right.png')
+images['enemy'][90][1] = pygame.image.load('sprites/enemy_right.png')
+images['enemy'][90][2] = pygame.image.load('sprites/enemy_right2.png')
+images['enemy'][90][3] = pygame.image.load('sprites/enemy_right2.png')
+
+
+
 class Sprite:
-    def __init__(self, game_environment, sprite_image, x_position=250, y_position=250, direction=0, velocity=0,
-                 sprite_size=20):
+    def __init__(self, game_environment, x_position=250, y_position=250, direction=180, velocity=0,
+                 sprite_size=20, type='robot'):
         self.game_environment = game_environment
         self.position = [x_position, y_position]
         self.direction = direction
         self.move_size = 20
-        self.img = sprite_image
-        self.original_img = sprite_image
+        if type=='robot' or type=='enemy':
+            self.img = images[type][self.direction][0]
+        elif type=='bullet':
+            self.img = bullet_img
         self.velocity = velocity
         self.hit_wall = False
         self.dead = False
         self.sprite_size = sprite_size
+        self.type = type
+        self.animation = 0
+        self.animation_pause = 0
+        self.enemy_near_length = 3
+    def animate_img(self):
+        if self.animation_pause == 0:
+            self.animation += 1
+            if self.animation == 4:
+                self.animation = 0
+            self.img = images[self.type][self.direction][self.animation]
+            self.animation_pause = 1
+        else:
+            self.animation_pause = 0
     def rotate(self, angle):
         self.direction += angle
         self.direction = self.direction % 360
-        self.img = pygame.transform.rotate(self.original_img, -self.direction)
+        if self.direction == 0:
+            self.img = images[self.type][self.direction][self.animation]
+        elif self.direction == 90:
+            self.img = images[self.type][self.direction][self.animation]
+        elif self.direction == 180:
+            self.img = images[self.type][self.direction][self.animation]
+        elif self.direction == 270:
+            self.img = images[self.type][self.direction][self.animation]
+
+        #self.img = pygame.transform.rotate(self.original_img, -self.direction)
     def move_forward(self, up_down=1):
         self.move_forward_by(up_down * self.move_size)
+        self.animate_img()
+
+
     def move_forward_by(self, move_distance):
         if self.direction == 0:
             self.position[1] -= move_distance
@@ -45,16 +110,66 @@ class Sprite:
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
     def shoot(self, velocity = 20):
-        new_bullet = Sprite(self.game_environment, sprite_image=bullet_img, x_position=self.position[0] + 10,
+        new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10,
                             y_position=self.position[1] + 10, direction=self.direction, velocity=velocity,
-                            sprite_size=3)
+                            sprite_size=3, type='bullet')
         self.game_environment.bullets.append(new_bullet)
     def enemy_left(self):
-        return False
+        direction_looking = self.direction - 90
+        direction_looking = direction_looking % 360
+        return self.enemy_near(direction_looking)
+
     def enemy_right(self):
-        return False
+        direction_looking = self.direction + 90
+        direction_looking = direction_looking % 360
+        return self.enemy_near(direction_looking)
     def enemy_front(self):
-        return False
+        direction_looking = self.direction - 90
+        direction_looking = direction_looking % 360
+        return self.enemy_near(direction_looking)
+    def enemy_near(self, direction_looking):
+        if direction_looking == 0:
+            for enemy in self.game_environment.enemies:
+                if ((self.position[1] - enemy.position[1]) < self.enemy_near_length * self.sprite_size) and \
+                    (self.position[1] - enemy.position[1]) > 0 and \
+                    (self.position[1] - enemy.position[1]) > abs(self.position[0] - enemy.position[0]):
+                    return True
+            return False
+        elif direction_looking == 180:
+            for enemy in self.game_environment.enemies:
+                if ((enemy.position[1] - self.position[1]) < self.enemy_near_length * self.sprite_size) and \
+                    (enemy.position[1] - self.position[1]) > 0 and \
+                    (enemy.position[1] - self.position[1]) > abs(self.position[0] - enemy.position[0]):
+                    return True
+            return False
+        if direction_looking == 90:
+            for enemy in self.game_environment.enemies:
+                if ((enemy.position[0] - self.position[0]) < self.enemy_near_length * self.sprite_size) and \
+                    (enemy.position[0] - self.position[0]) > 0 and \
+                    (enemy.position[0] - self.position[0]) > abs(self.position[1] - enemy.position[1]):
+                    return True
+            return False
+        if direction_looking == 270:
+            for enemy in self.game_environment.enemies:
+                if ((self.position[0] - enemy.position[0]) < self.enemy_near_length * self.sprite_size) and \
+                    (self.position[0] - enemy.position[0]) > 0 and \
+                    (self.position[0] - enemy.position[0]) > abs(self.position[1] - enemy.position[1]):
+                    return True
+            return False
+
+
+
+
     def wall_front(self):
-        return False
+        if self.direction == 0 and self.position[1] < self.sprite_size:
+            return True
+        elif self.direction == 90 and self.position[0] > screen_w - self.sprite_size - self.sprite_size:
+            return True
+        elif self.direction == 270 and self.position[0] < self.sprite_size:
+            return True
+        elif self.direction == 180 and self.position[1] > screen_h - self.sprite_size - self.sprite_size:
+            return True
+        else:
+            return False
+
 

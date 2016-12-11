@@ -21,20 +21,23 @@ sh
 input2 = """
 if el
     rl
-    if ef
-        sh
-    end
-    fd
+    sh
+    sh
+    sh
+    rr
 end
 if er
     rr
     sh
+    sh
+    sh
+    rl
 end
 if ef
     sh
+    sh
+    sh
 end
-sh
-fd
 """
 
 
@@ -133,8 +136,7 @@ img = pygame.Surface((20, 20))
 img.fill(white)
 pygame.draw.polygon(img, grey, ((5, 20), (10, 0), (15, 20)))
 
-enemy_img = pygame.image.load('enemy1.png')
-robot_img = pygame.image.load('robot1.png')
+
 
 bullet_img = pygame.Surface((3, 3))
 bullet_img.fill(black)
@@ -200,6 +202,18 @@ class GameEnvironment:
             enemy_to_robot = [float(robot_position[0] - enemy.position[0]) / length , float(robot_position[1] - enemy.position[1]) / length]
             self.enemies[i].position[0] += enemy_to_robot[0]
             self.enemies[i].position[1] += enemy_to_robot[1]
+            if abs(enemy_to_robot[0]) > abs(enemy_to_robot[1]):
+                if enemy_to_robot[0] > 0:
+                    self.enemies[i].direction = 90
+                else:
+                    self.enemies[i].direction = 270
+            else:
+                if enemy_to_robot[1] > 0:
+                    self.enemies[i].direction = 180
+                else:
+                    self.enemies[i].direction = 0
+
+            self.enemies[i].animate_img()
 
 
 def game_loop():
@@ -217,20 +231,28 @@ def game_loop():
 
     start_game()
 
+    ## enemies converge to the average of the robots, better if they target the closest one so they dont all converge on each other
+    ## algo only work for one robot
+    ## manual movement only works for one robot
 
+    robot = Sprite(game_environment, type='robot', x_position=50, y_position=200)
+    game_environment.robots.append(robot)
+    robot = Sprite(game_environment, type='robot', x_position=200, y_position=200)
+    game_environment.robots.append(robot)
+    robot = Sprite(game_environment, type='robot', x_position=500, y_position=50)
+    game_environment.robots.append(robot)
+    robot = Sprite(game_environment, type='robot', x_position=100, y_position=500)
+    game_environment.robots.append(robot)
 
-    robot = Sprite(game_environment, sprite_image=robot_img)
-    game_environment.robots = [robot]
+    algo = RobotAlgorithm(robot, input2)
 
-    algo = RobotAlgorithm(robot, input)
-
-    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=400, y_position=400)
+    enemy = Sprite(game_environment, type='enemy', x_position=400, y_position=400)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=200, y_position=100)
+    enemy = Sprite(game_environment, type='enemy', x_position=200, y_position=100)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=300, y_position=100)
+    enemy = Sprite(game_environment, type='enemy', x_position=300, y_position=100)
     game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, sprite_image=enemy_img, x_position=500, y_position=200)
+    enemy = Sprite(game_environment, type='enemy', x_position=500, y_position=200)
     game_environment.enemies.append(enemy)
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
@@ -243,29 +265,29 @@ def game_loop():
             if e.type == QUIT:
                 run_game = False
             elif e.type == KEYDOWN:
-            #     if e.key == K_RIGHT:
-            #         robot.rotate(90)
-            #     elif e.key == K_LEFT:
-            #         robot.rotate(-90)
-            #     elif e.key == K_UP:
-            #         up_down += 1
-            #     elif e.key == K_DOWN:
-            #         up_down -= 1
-            #     elif e.key == K_SPACE:
-            #         robot.shoot()
+                if e.key == K_RIGHT:
+                    robot.rotate(90)
+                elif e.key == K_LEFT:
+                    robot.rotate(-90)
+                elif e.key == K_UP:
+                    up_down += 1
+                elif e.key == K_DOWN:
+                    up_down -= 1
+                elif e.key == K_SPACE:
+                    robot.shoot()
                 if e.key == K_p:
                     pause()
-            # elif e.type == KEYUP:
-            #     if e.key == K_UP:
-            #         up_down -= 1
-            #     elif e.key == K_DOWN:
-            #         up_down += 1
+            elif e.type == KEYUP:
+                if e.key == K_UP:
+                    up_down -= 1
+                elif e.key == K_DOWN:
+                    up_down += 1
 
         rotate = 0
 
         algo.run_next_command()
-        #robot.rotate(rotate)
-        #robot.move_forward(up_down)
+        robot.rotate(rotate)
+        robot.move_forward(up_down)
 
         game_environment.update_enemy_positions()
 
