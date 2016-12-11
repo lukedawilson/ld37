@@ -83,7 +83,7 @@ def pause():
 def game_intro():
     s.fill(white)
     message_to_screen('Welcome to', green, -170, 'medium')
-    message_to_screen('Robotron', green, -100, 'large')
+    message_to_screen('Progotron', green, -100, 'large')
     message_to_screen('Kill enemy robots', black)
     message_to_screen('Press space to play again, q to quit', black, 150)
     pygame.display.update()
@@ -237,12 +237,13 @@ def game_loop():
 
     robot = Sprite(game_environment, type='robot', x_position=50, y_position=200)
     game_environment.robots.append(robot)
-    robot = Sprite(game_environment, type='robot', x_position=200, y_position=200)
-    game_environment.robots.append(robot)
-    robot = Sprite(game_environment, type='robot', x_position=500, y_position=50)
-    game_environment.robots.append(robot)
-    robot = Sprite(game_environment, type='robot', x_position=100, y_position=500)
-    game_environment.robots.append(robot)
+
+    # robot = Sprite(game_environment, type='robot', x_position=200, y_position=200)
+    # game_environment.robots.append(robot)
+    # robot = Sprite(game_environment, type='robot', x_position=500, y_position=50)
+    # game_environment.robots.append(robot)
+    # robot = Sprite(game_environment, type='robot', x_position=100, y_position=500)
+    # game_environment.robots.append(robot)
 
     algo = RobotAlgorithm(robot, input2)
 
