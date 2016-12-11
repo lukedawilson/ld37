@@ -18,11 +18,11 @@ class RobotAlgorithm:
         skip = int(statement[2]) if len(statement) > 2 else 0
         
         while cmd == 'if':
-            self.i = self.i + 1
+            self.i += 1
             
             passed = self.__evaluate(arg)
             if passed == False:
-                self.i = self.i + skip
+                self.i += skip
                 
             if self.i >= len(self.program):
                 cmd = None
@@ -42,7 +42,7 @@ class RobotAlgorithm:
         elif cmd =='sh':
             self.robot.shoot(15)
             
-        self.i = self.i + 1
+        self.i += 1
             
     def __evaluate(self, condition):
         value = not condition.startswith('!')
@@ -66,72 +66,49 @@ class RobotAlgorithm:
             if func == 'end':
                 return
             elif func == 'if':
-                section = list(reversed(block))
-                ifs = []
-                skip = 0
-                ends = 0
-                repeats = 0
-                for skip in range(0, len(section) - 1):
-                    inner = filter(None, section[skip].split(' '))
-                    inner_cmd = inner[0]
-                    
-                    if inner_cmd == 'if':
-                        ifs.insert(0, True)
-                    elif inner_cmd == 'end':
-                        if not ifs:
-                            break
-                        
-                        ends = ends + 1    
-                        ifs.pop()
-                    elif inner_cmd == 'else':
-                        if not ifs:
-                            break
-                            
-                        ifs.pop()
-                    elif len(inner) > 1:
-                        inner_arg = inner[1]
-                        repeats = repeats + int(inner_arg) - 1
-                    
-                    skip = skip + 1
-                    
-                result.append((func + ' ' + arg + ' ' + str(skip - ends + repeats)).strip())
+                skip = self.__get_if_block_length(block)    
+                result.append((func + ' ' + arg + ' ' + str(skip)).strip())
                 self.__compile(block, result, arg)
             elif func == 'else':
-                section = list(reversed(block)) #TODO method
-                ifs = []
-                skip = 0
-                ends = 0
-                repeats = 0
-                for skip in range(0, len(section) - 1):
-                    inner = filter(None, section[skip].split(' '))
-                    inner_cmd = inner[0]
-                    
-                    if inner_cmd == 'if':
-                        ifs.insert(0, True)
-                    elif inner_cmd == 'end':
-                        if not ifs:
-                            break
-                        
-                        ends = ends + 1    
-                        ifs.pop()
-                    elif inner_cmd == 'else':
-                        if not ifs:
-                            break
-                        
-                        ifs.pop()
-                    elif len(inner) > 1:
-                        inner_arg = inner[1]
-                        repeats = repeats + int(inner_arg) - 1
-                    
-                    skip = skip + 1
-            
-                result.append(('if !' + entry_condition + ' ' + str(skip - ends + repeats)).strip())
+                skip = self.__get_if_block_length(block)
+                result.append(('if !' + entry_condition + ' ' + str(skip)).strip())
                 self.__compile(block, result)
                 return
             else:
                 count = int(arg) if arg <> '' else 1
                 for _ in range(count):
                     result.append((func).strip())
+                    
+    def __get_if_block_length(self, block):
+        section = list(reversed(block))
+        ifs = []
+        skip = 0
+        ends = 0
+        repeats = 0
+        for skip in range(0, len(section) - 1):
+            inner = filter(None, section[skip].split(' '))
+            inner_cmd = inner[0]
+            
+            if inner_cmd == 'if':
+                ifs.insert(0, True)
+            elif inner_cmd == 'end':
+                if not ifs:
+                    break
+                
+                ends += 1    
+                ifs.pop()
+            elif inner_cmd == 'else':
+                if not ifs:
+                    break
+                
+                ifs.pop()
+            elif len(inner) > 1:
+                inner_arg = inner[1]
+                repeats += (int(inner_arg) - 1)
+            
+            skip += 1
+        
+        return skip - ends + repeats
         
     def __get_commands_stack(self, raw_program):
         return list(reversed(list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))))
