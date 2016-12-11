@@ -6,8 +6,9 @@ import math
 
 screen_w, screen_h = 800, 600
 black = (0, 0, 0)
+white = (255, 255, 255)
 bullet_img = pygame.Surface((3, 3))
-bullet_img.fill(black)
+bullet_img.fill(white)
 
 images = {'robot': {0:{}, 90:{}, 180:{}, 270:{}}, 'enemy': {0:{}, 90:{}, 180:{}, 270:{}}}
 
@@ -65,8 +66,8 @@ class Sprite:
         self.type = type
         self.animation = 0
         self.animation_pause = 0
-        self.enemy_near_length = 10
-        self.enemy_near_angle = 30
+        self.enemy_near_length = 20
+        self.enemy_near_angle = 15
     def animate_img(self):
         if self.animation_pause == 0:
             self.animation += 1
@@ -133,8 +134,8 @@ class Sprite:
         return self.enemy_near(direction_looking)
     def enemy_near(self, direction_looking):
         for enemy in self.game_environment.enemies:
-            polar_coords = Sprite.polar(enemy.position[0] - self.position[0] ,enemy.position[1] - self.position[1])
-            print polar_coords, direction_looking
+            polar_coords = Sprite.polar(enemy.position[0] - self.position[0] , - enemy.position[1] + self.position[1])
+            # print polar_coords, direction_looking
             if polar_coords[0] < (self.enemy_near_length * self.sprite_size) and \
                 abs(polar_coords[1] - direction_looking) < self.enemy_near_angle:
                 return True

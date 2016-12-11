@@ -17,27 +17,31 @@ sh
 rl
 sh
 """
+# if el
+#     rl
+#     sh
+#     sh
+#     sh
+#     fd
+#     rr
+# end
+# if er
+#     rr
+#     sh
+#     sh
+#     sh
+#     fd
+#     rl
+# end
 
 input2 = """
-if el
-    rl
-    sh
-    sh
-    sh
-    rr
-end
-if er
-    rr
-    sh
-    sh
-    sh
-    rl
-end
 if ef
-    sh
-    sh
-    sh
+ sh 10
+    rl
 end
+fd 5
+rr
+
 """
 
 
@@ -47,12 +51,14 @@ def die(score = 0):
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
-            return
+            pygame.display.quit()
+            quit()
         elif event.type == KEYDOWN:
             if event.key == K_q:
-                return
+                pygame.display.quit()
+                quit()
             elif event.key == K_SPACE:
-                game_loop()
+                return
 
 def start_game():
     s.fill(white)
@@ -153,6 +159,11 @@ class GameEnvironment:
         self.robots = []
         self.bullets = []
         self.enemies = []
+        self.algos = []
+
+    def run_next_algo_command(self):
+        for algo in self.algos:
+            algo.run_next_command()
     def clean_up_bullets_and_dead(self):
         self.mark_dead()
         self.clean_up_bullets()
@@ -186,10 +197,13 @@ class GameEnvironment:
         self.enemies = new_enemies
     def clean_up_robots(self):
         new_robots = []
-        for robot in self.robots:
+        new_algos = []
+        for i, robot in enumerate(self.robots):
             if not robot.dead:
                 new_robots.append(robot)
+                new_algos.append(self.algos[i])
         self.robots = new_robots
+        self.algos = new_algos
     def update_enemy_positions(self):
         robot_position = [0,0]
         for robot in self.robots:
@@ -216,7 +230,16 @@ class GameEnvironment:
             self.enemies[i].animate_img()
 
 
-def game_loop():
+def game():
+    while True:
+        game_intro()
+        level = 1
+        level_outcome = 'success'
+        while level_outcome == 'success':
+            level_outcome = game_level(level)
+            level += 1
+
+def game_level(level = 1):
 
 
 
@@ -226,7 +249,7 @@ def game_loop():
 
 
 
-    pygame.display.set_caption('Robotron')
+    pygame.display.set_caption('Progrotron')
     pygame.display.update()
 
     start_game()
@@ -235,47 +258,53 @@ def game_loop():
     ## algo only work for one robot
     ## manual movement only works for one robot
 
-    robot = Sprite(game_environment, type='robot', x_position=50, y_position=200)
-    game_environment.robots.append(robot)
+    number_of_robots = 4;
+    for i in range(number_of_robots):
+        rand_x = random.random()
+        rand_y = random.random()
+        x_start_position = 0.6 * rand_x * screen_w + 0.2 * screen_w
+        y_start_position = 0.6 * rand_y * screen_h + 0.2 * screen_h
+        robot = Sprite(game_environment, type='robot', x_position=x_start_position, y_position=y_start_position)
+        game_environment.robots.append(robot)
+        algo = RobotAlgorithm(robot, input2)
+        game_environment.algos.append(algo)
 
-    # robot = Sprite(game_environment, type='robot', x_position=200, y_position=200)
-    # game_environment.robots.append(robot)
-    # robot = Sprite(game_environment, type='robot', x_position=500, y_position=50)
-    # game_environment.robots.append(robot)
-    # robot = Sprite(game_environment, type='robot', x_position=100, y_position=500)
-    # game_environment.robots.append(robot)
 
-    algo = RobotAlgorithm(robot, input2)
 
-    enemy = Sprite(game_environment, type='enemy', x_position=400, y_position=400)
-    game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, type='enemy', x_position=200, y_position=100)
-    game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, type='enemy', x_position=300, y_position=100)
-    game_environment.enemies.append(enemy)
-    enemy = Sprite(game_environment, type='enemy', x_position=500, y_position=200)
-    game_environment.enemies.append(enemy)
+
+
+    for i in range(level + 10):
+        rand_x = random.random()
+        rand_y = random.random()
+        x_start_position = rand_x * (screen_w - 20)
+        y_start_position = rand_y * (screen_h - 20)
+        enemy = Sprite(game_environment, type='enemy', x_position=x_start_position, y_position=y_start_position)
+        game_environment.enemies.append(enemy)
+
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
+    shoot = False
 
 
     while run_game:
         clock.tick(fps)
 
+        rotate = 0
         for e in pygame.event.get():
             if e.type == QUIT:
-                run_game = False
+                pygame.display.quit()
+                quit()
             elif e.type == KEYDOWN:
                 if e.key == K_RIGHT:
-                    robot.rotate(90)
+                    rotate = 90
                 elif e.key == K_LEFT:
-                    robot.rotate(-90)
+                    rotate = -90
                 elif e.key == K_UP:
                     up_down += 1
                 elif e.key == K_DOWN:
                     up_down -= 1
                 elif e.key == K_SPACE:
-                    robot.shoot()
+                    shoot = True
                 if e.key == K_p:
                     pause()
             elif e.type == KEYUP:
@@ -284,15 +313,19 @@ def game_loop():
                 elif e.key == K_DOWN:
                     up_down += 1
 
-        rotate = 0
 
-        algo.run_next_command()
-        robot.rotate(rotate)
-        robot.move_forward(up_down)
+        game_environment.run_next_algo_command()
+        for robot in game_environment.robots:
+            robot.rotate(rotate)
+            robot.move_forward(up_down)
+            if shoot:
+                robot.shoot()
+
+        shoot = False
 
         game_environment.update_enemy_positions()
 
-        s.fill(white)
+        s.fill(black)
         for bullet in game_environment.bullets:
             bullet.update_for_velocity()
             s.blit(bullet.img, bullet.position)
@@ -301,16 +334,16 @@ def game_loop():
         for enemy in game_environment.enemies:
             s.blit(enemy.img, enemy.position)
 
-        game_environment.clean_up_bullets_and_dead()
+        level_outcome = game_environment.clean_up_bullets_and_dead()
 
 
         pygame.display.update()
 
-
-    pygame.display.quit()
-    quit()
-
+        if level_outcome == 'die' or level_outcome == 'success':
+            run_game = False
 
 
-game_intro()
-game_loop()
+    return level_outcome
+
+
+game()
