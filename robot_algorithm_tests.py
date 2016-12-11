@@ -104,6 +104,9 @@ def test_nested_if():
         rl
     end
     if ef
+        if el
+            rr
+        end
         fd
     end
     rr
@@ -126,7 +129,7 @@ def test_if_with_repeat():
         sh
     end
     if er
-        rr
+        rr 4
         sh
     end
     fd
@@ -155,7 +158,10 @@ def test_nested_if_with_repeat():
         rl
     end
     if ef
-        fd
+        fd 3
+        if el
+            rr 4
+        end
     end
     rr 3
     """
@@ -167,7 +173,6 @@ def test_nested_if_with_repeat():
         algo.run_next_command()
         
     assert_are_equal(['mv 1', 'mv 1', 'r -90', 'sh 15', 'sh 15', 'r 90', 'r 90', 'r 90', 'sh 15', 'r -90', 'r 90', 'r 90', 'r 90'], robot.get_commands())    
-
 
 test_basic_commands()
 test_repeat_arg()

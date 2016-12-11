@@ -72,20 +72,26 @@ class RobotAlgorithm:
                 ifs = []
                 skip = 0
                 ends = 0
+                repeats = 0
                 for skip in range(0, len(section) - 1):
-                    next = filter(None, section[skip].split(' '))
-                    if next[0] == 'if':
+                    inner = filter(None, section[skip].split(' '))
+                    inner_cmd = inner[0]
+                    
+                    if inner_cmd == 'if':
                         ifs.insert(0, True)
-                    elif next[0] == 'end':
+                    elif inner_cmd == 'end':
                         if not ifs:
                             break
                         
                         ends = ends + 1    
                         ifs.pop()
+                    elif len(inner) > 1:
+                        inner_arg = inner[1]
+                        repeats = repeats + int(inner_arg) - 1
                     
                     skip = skip + 1
                     
-                result.append((func + ' ' + arg + ' ' + str(skip - ends)).strip())
+                result.append((func + ' ' + arg + ' ' + str(skip - ends + repeats)).strip())
                 self.__compile(block, result)
         
     def __get_commands_stack(self, raw_program):
