@@ -30,9 +30,10 @@ class Sprite:
         return self.front
 
 def assert_are_equal(expected, actual):
-   print inspect.stack()[1][3] + ': ' + 'Passed' if expected == actual else 'Failed'
+   print inspect.stack()[1][3] + ': ' + ('Passed' if expected == actual else 'Failed')
 
 def test_basic_commands():
+    # Arange
     input = """
     rl
     rr
@@ -42,12 +43,15 @@ def test_basic_commands():
     robot = Sprite()
     algo = RobotAlgorithm(robot, input)
 
+    # Act
     for _ in range(4):    
         algo.run_next_command()
     
+    #Assert
     assert_are_equal(['r -90', 'r 90', 'mv 1', 'sh 15'], robot.get_commands())
     
 def test_repeat_arg():
+    # Arrange
     input = """
     rl 3
     sh
@@ -56,22 +60,118 @@ def test_repeat_arg():
     robot = Sprite()
     algo = RobotAlgorithm(robot, input)
     
+    # Act
     for _ in range(6):
         algo.run_next_command()
     
+    # Assert
     assert_are_equal(['r -90', 'r -90', 'r -90', 'sh 15', 'mv 1', 'mv 1'], robot.get_commands())
     
 def test_if():
-    None
+    # Arrange
+    input = """
+    fd
+    if el
+        rl
+        sh
+    end
+    if er
+        rr
+        sh
+    end
+    fd
+    """
+    robot = Sprite(True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(4):
+        algo.run_next_command()
+        
+    assert_are_equal(['mv 1', 'r -90', 'sh 15', 'mv 1'], robot.get_commands())    
     
 def test_nested_if():
-    None
+    # Arrange
+    input = """
+    fd
+    if el
+        rl
+        sh
+        if er
+            rr
+            sh
+        end
+        rl
+    end
+    if ef
+        fd
+    end
+    rr
+    """
+    robot = Sprite(True, True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(7):
+        algo.run_next_command()
+        
+    assert_are_equal(['mv 1', 'r -90', 'sh 15', 'r 90', 'sh 15', 'r -90', 'r 90'], robot.get_commands())    
 
 def test_if_with_repeat():
-    None
+     # Arrange
+    input = """
+    fd
+    if el
+        rl 3
+        sh
+    end
+    if er
+        rr
+        sh
+    end
+    fd
+    """
+    robot = Sprite(True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(6):
+        algo.run_next_command()
+        
+    assert_are_equal(['mv 1', 'r -90', 'r -90', 'r -90', 'sh 15', 'mv 1'], robot.get_commands())    
+    
     
 def test_nested_if_with_repeat():
-    None
+    # Arrange
+    input = """
+    fd 2
+    if el
+        rl
+        sh 2
+        if er
+            rr 3
+            sh
+        end
+        rl
+    end
+    if ef
+        fd
+    end
+    rr 3
+    """
+    robot = Sprite(True, True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(13):
+        algo.run_next_command()
+        
+    assert_are_equal(['mv 1', 'mv 1', 'r -90', 'sh 15', 'sh 15', 'r 90', 'r 90', 'r 90', 'sh 15', 'r -90', 'r 90', 'r 90', 'r 90'], robot.get_commands())    
+
 
 test_basic_commands()
 test_repeat_arg()
+test_if()
+test_nested_if()
+test_if_with_repeat()
+test_nested_if_with_repeat()
