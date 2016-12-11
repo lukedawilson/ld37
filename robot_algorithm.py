@@ -67,11 +67,11 @@ class RobotAlgorithm:
                 return
             elif func == 'if':
                 skip = self.__get_if_block_length(block)    
-                result.append((func + ' ' + arg + ' ' + str(skip)).strip())
+                result.append('{} {} {}'.format(func, arg, str(skip)).strip())
                 self.__compile(block, result, arg)
             elif func == 'else':
                 skip = self.__get_if_block_length(block)
-                result.append(('if !' + entry_condition + ' ' + str(skip)).strip())
+                result.append('if !{} {}'.format(entry_condition, str(skip)).strip())
                 self.__compile(block, result)
                 return
             else:

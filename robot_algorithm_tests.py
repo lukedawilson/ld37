@@ -12,13 +12,13 @@ class Sprite:
         return self.commands    
 
     def rotate(self, angle):
-        self.commands.append('r ' + str(angle))
+        self.commands.append('r {}'.format(str(angle)))
         
     def move_forward(self, direction=1): # 1=forward, -1=backwards, 0=sit on yer arse
-        self.commands.append('mv ' + str(direction))
+        self.commands.append('mv {}'.format(str(direction)))
         
     def shoot(self, velocity=10):
-        self.commands.append('sh ' + str(velocity))
+        self.commands.append('sh {}'.format(str(velocity)))
         
     def enemy_left(self):
         return self.left
@@ -33,9 +33,9 @@ def assert_are_equal(expected, actual):
    test = inspect.stack()[1][3]
    passed = expected == actual
    if passed:
-       print test + ' passed'
+       print '{} PASSED'.format(test)
    else:
-       print test + ' failed\n\nExpected:\n' + str(expected) + '\n\nActual:\n' + str(actual)
+       print '{} FAILED\n\nExpected:\n{}\n\nActual:\n{}'.format(test, str(expected), str(actual))
 
 def test_basic_commands():
     # Arange
