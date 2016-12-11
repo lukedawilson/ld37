@@ -119,22 +119,43 @@ class Sprite:
                             y_position=self.position[1] + 10, direction=self.direction, velocity=velocity,
                             sprite_size=3, type='bullet')
         self.game_environment.bullets.append(new_bullet)
+
     def enemy_left(self):
-        direction_looking = self.direction - 90
-        direction_looking = direction_looking % 360
-        return self.enemy_near(direction_looking)
+        return self.element_left(self.game_environment.enemies)
 
     def enemy_right(self):
-        direction_looking = self.direction + 90
-        direction_looking = direction_looking % 360
-        return self.enemy_near(direction_looking)
+        return self.element_right(self.game_environment.enemies)
+
     def enemy_front(self):
+        return self.element_front(self.game_environment.enemies)
+
+    def friend_left(self):
+        return self.element_left(self.game_environment.robots)
+
+    def friend_right(self):
+        return self.element_right(self.game_environment.robots)
+
+    def friend_front(self):
+        return self.element_front(self.game_environment.robots)
+
+    def element_left(self, elements):
+        direction_looking = self.direction - 90
+        direction_looking %= 360
+        return self.element_near(direction_looking, elements)
+
+    def element_right(self, elements):
+        direction_looking = self.direction + 90
+        direction_looking %= 360
+        return self.element_near(direction_looking, elements)
+
+    def element_front(self, elements):
         direction_looking = self.direction
-        direction_looking = direction_looking % 360
-        return self.enemy_near(direction_looking)
-    def enemy_near(self, direction_looking):
-        for enemy in self.game_environment.enemies:
-            polar_coords = Sprite.polar(enemy.position[0] - self.position[0] , - enemy.position[1] + self.position[1])
+        direction_looking %= 360
+        return self.element_near(direction_looking, elements)
+
+    def element_near(self, direction_looking, elements):
+        for element in elements:
+            polar_coords = Sprite.polar(element.position[0] - self.position[0], - element.position[1] + self.position[1])
             # print polar_coords, direction_looking
             if polar_coords[0] < (self.enemy_near_length * self.sprite_size) and \
                 abs(polar_coords[1] - direction_looking) < self.enemy_near_angle:

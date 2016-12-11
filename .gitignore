@@ -90,3 +90,6 @@ ENV/
 
 # Qpython junk
 .last_tmp.py
+
+# Pycharm junk
+.idea/workspace.xml
