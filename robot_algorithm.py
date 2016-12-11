@@ -5,10 +5,10 @@ class RobotAlgorithm:
     def __init__(self, robot, raw_program):
         self.robot = robot
         
-        stack = self.__parse_program(raw_program) # stack
+        stack = self.__get_commands_stack(raw_program)
         self.program = []
-        self.__parse(list(stack), self.program)
-
+        self.__compile(list(stack), self.program)
+        
         self.i = 0
         
     def run_next_command(self):
@@ -57,9 +57,10 @@ class RobotAlgorithm:
             
         return False    
             
-    def __parse(self, block, result):
+    def __compile(self, block, result):
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
+            print statement
             func = statement[0]
             arg = statement[1] if len(statement) > 1 else ''
             
@@ -67,7 +68,9 @@ class RobotAlgorithm:
                 return
             
             if func <> 'if':
-                result.append((func + ' ' + arg).strip())
+                count = int(arg) if arg <> '' else 1
+                for _ in range(count):
+                    result.append((func).strip())
             else:
                 section = list(reversed(block))
                 ifs = []
@@ -87,7 +90,7 @@ class RobotAlgorithm:
                     skip = skip + 1
                     
                 result.append((func + ' ' + arg + ' ' + str(skip - ends)).strip())
-                self.__parse(block, result)
+                self.__compile(block, result)
         
-    def __parse_program(self, raw_program):
-        return list(reversed(list(filter(None, raw_program.split('\n')))))
+    def __get_commands_stack(self, raw_program):
+        return list(reversed(list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))))

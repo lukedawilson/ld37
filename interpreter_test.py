@@ -1,54 +1,48 @@
-from time import sleep
 from robot_algorithm import RobotAlgorithm
 
 class Sprite:
+    def __init__(self, left = False, right = False, front = False):
+        self.left = left
+        self.right = right
+        self.front = front
+        self.commands = []
+        
+    def get_commands(self):
+        return self.commands    
+
     def rotate(self, angle):
-        print 'Rotate ' + str(angle) + ' degrees'
+        self.commands.append('r ' + str(angle))
         
     def move_forward(self, direction=1): # 1=forward, -1=backwards, 0=sit on yer arse
-        print 'Move ' + ('forwards' if 1 else ('backwards' if -1 else 'nowhere'))
+        self.commands.append('mv ' + str(direction))
         
     def shoot(self, velocity=10):
-        print 'Shoot at ' + str(velocity) + ' velocity'
+        self.commands.append('sh ' + str(velocity))
         
     def enemy_left(self):
-        return True
+        return self.left
         
     def enemy_right(self):
-        return False
+        return self.right
         
     def enemy_front(self):
-        return True
-        
-    def wall_front(self):
-        return False
-        
-    def dead(self):
-        return False
+        return self.front
 
-input = """
-if el
+def test_basic_commands():
+    input = """
     rl
-    if ef
-        sh
-    end                    
-    fd
-end
-if er
     rr
+    fd
     sh
-end
-if ef
-    sh
-end
-sh
-fd
-"""
-
-robot = Sprite()
-algo = RobotAlgorithm(robot, input)
-
-for _ in range(6):
-    algo.run_next_command()
-    sleep(0.3)
+    """
+    robot = Sprite()
+    algo = RobotAlgorithm(robot, input)
     
+    algo.run_next_command()
+    algo.run_next_command()
+    algo.run_next_command()
+    algo.run_next_command()
+
+    print robot.get_commands() == ['r -90', 'r 90', 'mv 1', 'sh 15']
+
+test_basic_commands()
