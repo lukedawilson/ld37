@@ -28,6 +28,24 @@ class Sprite:
         
     def enemy_front(self):
         return self.front
+        
+    def friend_left(self):
+        return self.left
+        
+    def friend_right(self):
+        return self.right
+        
+    def friend_front(self):
+        return self.front
+        
+    def wall_left(self):
+        return self.left
+        
+    def wall_right(self):
+        return self.right
+        
+    def wall_front(self):
+        return self.front 
 
 def assert_are_equal(expected, actual):
    test = inspect.stack()[1][3]
@@ -76,11 +94,11 @@ def test_if():
     # Arrange
     input = """
     fd
-    if el
+    if fl
         rl
         sh
     end
-    if er
+    if fr
         rr
         sh
     end
@@ -99,7 +117,7 @@ def test_nested_if():
     # Arrange
     input = """
     fd
-    if el
+    if wl
         rl
         sh
         if er
@@ -108,7 +126,7 @@ def test_nested_if():
         end
         rl
     end
-    if ef
+    if wf
         if el
             rr
         end

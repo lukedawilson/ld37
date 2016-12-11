@@ -54,7 +54,19 @@ class RobotAlgorithm:
             return self.robot.enemy_right() == value
         if condition == 'ef':
             return self.robot.enemy_front() == value
-            
+        if condition == 'fl':
+            return self.robot.friend_left() == value
+        if condition == 'fr':
+            return self.robot.friend_right() == value
+        if condition == 'ff':
+            return self.robot.friend_front() == value
+        if condition == 'wl':
+            return self.robot.wall_left() == value
+        if condition == 'wr':
+            return self.robot.wall_right() == value
+        if condition == 'wf':
+            return self.robot.wall_front() == value
+                            
         return False    
             
     def __compile(self, block, result, entry_condition=None):
