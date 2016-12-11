@@ -37,12 +37,25 @@ def test_basic_commands():
     """
     robot = Sprite()
     algo = RobotAlgorithm(robot, input)
-    
-    algo.run_next_command()
-    algo.run_next_command()
-    algo.run_next_command()
-    algo.run_next_command()
 
+    for _ in range(4):    
+        algo.run_next_command()
+    
     print robot.get_commands() == ['r -90', 'r 90', 'mv 1', 'sh 15']
+    
+def test_repeat_arg():
+    input = """
+    rl 3
+    sh
+    fd 2
+    """
+    robot = Sprite()
+    algo = RobotAlgorithm(robot, input)
+    
+    for _ in range(6):
+        algo.run_next_command()
+    
+    print robot.get_commands() == ['r -90', 'r -90', 'r -90', 'sh 15', 'mv 1', 'mv 1']
 
 test_basic_commands()
+test_repeat_arg()

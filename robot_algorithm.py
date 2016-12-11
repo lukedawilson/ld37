@@ -1,6 +1,3 @@
-import switch
-from robot import Sprite
-
 class RobotAlgorithm:
     def __init__(self, robot, raw_program):
         self.robot = robot
@@ -60,7 +57,6 @@ class RobotAlgorithm:
     def __compile(self, block, result):
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
-            print statement
             func = statement[0]
             arg = statement[1] if len(statement) > 1 else ''
             
