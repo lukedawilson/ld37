@@ -49,6 +49,9 @@ if el
     sh 3
     tr
 end
+if ff
+    sh 3
+end
 fd
 rr
 
@@ -58,7 +61,7 @@ rr
 
 def die(score = 0):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
-    message_to_screen('Your score was: '+str(score)+', press space to play again, q to quit', black)
+    message_to_screen('Your score was: '+str(score)+', press return to play again, q to quit', red)
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
@@ -68,7 +71,7 @@ def die(score = 0):
             if event.key == K_q:
                 pygame.display.quit()
                 quit()
-            elif event.key == K_SPACE:
+            elif event.key == K_RETURN:
                 return
 
 def level_complete():
@@ -177,6 +180,7 @@ class GameEnvironment:
         self.enemies = []
         self.algos = []
 
+
     def run_next_algo_command(self):
         for algo in self.algos:
             algo.run_next_command()
@@ -227,29 +231,31 @@ class GameEnvironment:
         self.robots = new_robots
         self.algos = new_algos
     def update_enemy_positions(self):
-        robot_position = [0,0]
-        for robot in self.robots:
-            robot_position[0] += robot.position[0]
-            robot_position[1] += robot.position[1]
-        robot_position[0] /= len(self.robots)
-        robot_position[1] /= len(self.robots)
-        for i, enemy in enumerate(self.enemies):
-            length = math.sqrt(((robot_position[0] - enemy.position[0]) ** 2) + ((robot_position[1] - enemy.position[1]) ** 2))
-            enemy_to_robot = [float(robot_position[0] - enemy.position[0]) / length , float(robot_position[1] - enemy.position[1]) / length]
-            self.enemies[i].position[0] += enemy_to_robot[0]
-            self.enemies[i].position[1] += enemy_to_robot[1]
+
+        for enemy in self.enemies:
+            nearest_robot = 0
+            shortest_distance = 10000
+            for i, robot in enumerate(self.robots):
+                distance, _ = Sprite.polar(robot.position[0] - enemy.position[0], robot.position[1] - enemy.position[1])
+                if distance < shortest_distance:
+                    shortest_distance = distance
+                    nearest_robot = i
+            enemy_to_robot = [float(self.robots[nearest_robot].position[0] - enemy.position[0]) / shortest_distance ,
+                              float(self.robots[nearest_robot].position[1] - enemy.position[1]) / shortest_distance]
+            enemy.position[0] += enemy_to_robot[0]
+            enemy.position[1] += enemy_to_robot[1]
             if abs(enemy_to_robot[0]) > abs(enemy_to_robot[1]):
                 if enemy_to_robot[0] > 0:
-                    self.enemies[i].direction = 90
+                    enemy.direction = 90
                 else:
-                    self.enemies[i].direction = 270
+                    enemy.direction = 270
             else:
                 if enemy_to_robot[1] > 0:
-                    self.enemies[i].direction = 180
+                    enemy.direction = 180
                 else:
-                    self.enemies[i].direction = 0
+                    enemy.direction = 0
 
-            self.enemies[i].animate_img()
+            enemy.animate_img()
 
 
 def game():
@@ -277,7 +283,6 @@ def game_level(level, no_of_robots):
 
     start_game()
 
-    ## enemies converge to the average of the robots, better if they target the closest one so they dont all converge on each other
     ## add in level display and robot display
     ## make a robotron style level complete
     ## starting screen

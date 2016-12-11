@@ -163,7 +163,7 @@ class Sprite:
         return False
 
     @staticmethod
-    def polar(x, y):
+    def polar(x, y): # returns distance, degrees angle
         return math.hypot(x,y), math.degrees(math.atan2(x, y)) % 360
 
     def wall_front(self):
