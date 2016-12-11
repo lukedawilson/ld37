@@ -114,7 +114,7 @@ class Sprite:
             self.hit_wall = True
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
-    def shoot(self, velocity = 20):
+    def shoot(self, velocity = 30):
         new_bullet = Sprite(self.game_environment, x_position=self.position[0] + 10,
                             y_position=self.position[1] + 10, direction=self.direction, velocity=velocity,
                             sprite_size=3, type='bullet')

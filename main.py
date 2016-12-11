@@ -2,6 +2,7 @@ import pygame, random, sys, math
 from pygame.locals import *
 from robot_algorithm import *
 from robot import Sprite
+from time import sleep
 
 input = """
 fd
@@ -36,11 +37,21 @@ sh
 
 input2 = """
 if ef
- sh 10
-    rl
+    sh 3
 end
-fd 5
+if er
+    tr
+    sh 3
+    tl
+end
+if el
+    tl
+    sh 3
+    tr
+end
+fd
 rr
+
 
 """
 
@@ -60,16 +71,20 @@ def die(score = 0):
             elif event.key == K_SPACE:
                 return
 
+def level_complete():
+    message_to_screen('Level complete', red, y_displace=-75, size='large')
+    sleep(3)
+
 def start_game():
     s.fill(white)
-    message_to_screen('Press space to start', black)
+    message_to_screen('Press return to start', black)
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
             pygame.display.quit()
             quit()
         elif event.type == KEYDOWN:
-            if event.key == K_SPACE:
+            if event.key == K_RETURN:
                 return
 def pause():
     message_to_screen('Paused', black, size='large')
@@ -91,7 +106,7 @@ def game_intro():
     message_to_screen('Welcome to', green, -170, 'medium')
     message_to_screen('Progotron', green, -100, 'large')
     message_to_screen('Kill enemy robots', black)
-    message_to_screen('Press space to play again, q to quit', black, 150)
+    message_to_screen('Press return to play again, q to quit', black, 150)
     pygame.display.update()
     while True:
         for event in pygame.event.get():
@@ -102,7 +117,7 @@ def game_intro():
                 if event.key == K_q:
                     pygame.quit()
                     quit()
-                elif event.key == K_SPACE:
+                elif event.key == K_RETURN:
                     return
 
         clock.tick(5)
@@ -128,6 +143,7 @@ blue = (0, 0, 255)
 green = (0, 155, 0)
 grey = (100, 100, 100)
 screen_w, screen_h = 800, 600
+number_of_robots = 4
 
 pygame.init()
 s = pygame.display.set_mode((screen_w, screen_h))
@@ -149,7 +165,7 @@ bullet_img.fill(black)
 
 
 
-## skier_c = pygame.image.load('skier_c.png')
+
 
 
 
@@ -171,6 +187,12 @@ class GameEnvironment:
         self.clean_up_robots()
         if len(self.robots) == 0:
             die()
+            return 'die', len(self.robots)
+        if len(self.enemies) == 0:
+            level_complete()
+            return 'success', len(self.robots)
+        else:
+            return 'continue', len(self.robots)
     def mark_dead(self):
         for i, bullet in enumerate(self.bullets):
             for j, enemy in enumerate(self.enemies):
@@ -234,12 +256,13 @@ def game():
     while True:
         game_intro()
         level = 1
+        no_of_robots = 4
         level_outcome = 'success'
         while level_outcome == 'success':
-            level_outcome = game_level(level)
+            level_outcome, no_of_robots = game_level(level, no_of_robots)
             level += 1
 
-def game_level(level = 1):
+def game_level(level, no_of_robots):
 
 
 
@@ -255,11 +278,11 @@ def game_level(level = 1):
     start_game()
 
     ## enemies converge to the average of the robots, better if they target the closest one so they dont all converge on each other
-    ## algo only work for one robot
-    ## manual movement only works for one robot
+    ## add in level display and robot display
+    ## make a robotron style level complete
+    ## starting screen
 
-    number_of_robots = 4;
-    for i in range(number_of_robots):
+    for i in range(no_of_robots):
         rand_x = random.random()
         rand_y = random.random()
         x_start_position = 0.6 * rand_x * screen_w + 0.2 * screen_w
@@ -273,7 +296,7 @@ def game_level(level = 1):
 
 
 
-    for i in range(level + 10):
+    for i in range(level + 5):
         rand_x = random.random()
         rand_y = random.random()
         x_start_position = rand_x * (screen_w - 20)
@@ -334,7 +357,7 @@ def game_level(level = 1):
         for enemy in game_environment.enemies:
             s.blit(enemy.img, enemy.position)
 
-        level_outcome = game_environment.clean_up_bullets_and_dead()
+        level_outcome, no_of_robots = game_environment.clean_up_bullets_and_dead()
 
 
         pygame.display.update()
@@ -343,7 +366,7 @@ def game_level(level = 1):
             run_game = False
 
 
-    return level_outcome
+    return level_outcome, no_of_robots
 
 
 game()
