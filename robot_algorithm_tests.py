@@ -1,4 +1,5 @@
 from robot_algorithm import RobotAlgorithm
+import inspect
 
 class Sprite:
     def __init__(self, left = False, right = False, front = False):
@@ -28,6 +29,9 @@ class Sprite:
     def enemy_front(self):
         return self.front
 
+def assert_are_equal(expected, actual):
+   print inspect.stack()[1][3] + ': ' + 'Passed' if expected == actual else 'Failed'
+
 def test_basic_commands():
     input = """
     rl
@@ -41,7 +45,7 @@ def test_basic_commands():
     for _ in range(4):    
         algo.run_next_command()
     
-    print robot.get_commands() == ['r -90', 'r 90', 'mv 1', 'sh 15']
+    assert_are_equal(['r -90', 'r 90', 'mv 1', 'sh 15'], robot.get_commands())
     
 def test_repeat_arg():
     input = """
@@ -55,7 +59,19 @@ def test_repeat_arg():
     for _ in range(6):
         algo.run_next_command()
     
-    print robot.get_commands() == ['r -90', 'r -90', 'r -90', 'sh 15', 'mv 1', 'mv 1']
+    assert_are_equal(['r -90', 'r -90', 'r -90', 'sh 15', 'mv 1', 'mv 1'], robot.get_commands())
+    
+def test_if():
+    None
+    
+def test_nested_if():
+    None
+
+def test_if_with_repeat():
+    None
+    
+def test_nested_if_with_repeat():
+    None
 
 test_basic_commands()
 test_repeat_arg()
