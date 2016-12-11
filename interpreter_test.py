@@ -12,13 +12,13 @@ class Sprite:
         print 'Shoot at ' + str(velocity) + ' velocity'
         
     def enemy_left(self):
-        return False
+        return True
         
     def enemy_right(self):
         return False
         
     def enemy_front(self):
-        return False
+        return True
         
     def wall_front(self):
         return False
@@ -31,7 +31,7 @@ if el
     rl
     if ef
         sh
-    end
+    end                    
     fd
 end
 if er
@@ -41,14 +41,14 @@ end
 if ef
     sh
 end
-fd
 sh
+fd
 """
 
 robot = Sprite()
 algo = RobotAlgorithm(robot, input)
 
-for _ in range(20):
+for _ in range(6):
     algo.run_next_command()
     sleep(0.3)
     

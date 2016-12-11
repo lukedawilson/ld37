@@ -21,11 +21,12 @@ class RobotAlgorithm:
         skip = int(statement[2]) if len(statement) > 2 else 0
         
         while cmd == 'if':
+            self.i = self.i + 1
+            
             passed = self.__evaluate(arg)
             if passed == False:
                 self.i = self.i + skip
                 
-            self.i = self.i + 1
             if self.i >= len(self.program):
                 cmd = None
                 break
@@ -71,6 +72,7 @@ class RobotAlgorithm:
                 section = list(reversed(block))
                 ifs = []
                 skip = 0
+                ends = 0
                 for skip in range(0, len(section) - 1):
                     next = filter(None, section[skip].split(' '))
                     if next[0] == 'if':
@@ -78,12 +80,13 @@ class RobotAlgorithm:
                     elif next[0] == 'end':
                         if not ifs:
                             break
-                            
-                        ifs.pop()
                         
+                        ends = ends + 1    
+                        ifs.pop()
+                    
                     skip = skip + 1
                     
-                result.append((func + ' ' + arg + ' ' + str(skip)).strip())
+                result.append((func + ' ' + arg + ' ' + str(skip - ends)).strip())
                 self.__parse(block, result)
         
     def __parse_program(self, raw_program):
