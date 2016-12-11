@@ -1,5 +1,8 @@
 #TODO this is a stub of your Robot class - replace with import of real thing
 import pygame
+import math
+
+
 
 screen_w, screen_h = 800, 600
 black = (0, 0, 0)
@@ -62,7 +65,8 @@ class Sprite:
         self.type = type
         self.animation = 0
         self.animation_pause = 0
-        self.enemy_near_length = 3
+        self.enemy_near_length = 10
+        self.enemy_near_angle = 30
     def animate_img(self):
         if self.animation_pause == 0:
             self.animation += 1
@@ -124,41 +128,21 @@ class Sprite:
         direction_looking = direction_looking % 360
         return self.enemy_near(direction_looking)
     def enemy_front(self):
-        direction_looking = self.direction - 90
+        direction_looking = self.direction
         direction_looking = direction_looking % 360
         return self.enemy_near(direction_looking)
     def enemy_near(self, direction_looking):
-        if direction_looking == 0:
-            for enemy in self.game_environment.enemies:
-                if ((self.position[1] - enemy.position[1]) < self.enemy_near_length * self.sprite_size) and \
-                    (self.position[1] - enemy.position[1]) > 0 and \
-                    (self.position[1] - enemy.position[1]) > abs(self.position[0] - enemy.position[0]):
-                    return True
-            return False
-        elif direction_looking == 180:
-            for enemy in self.game_environment.enemies:
-                if ((enemy.position[1] - self.position[1]) < self.enemy_near_length * self.sprite_size) and \
-                    (enemy.position[1] - self.position[1]) > 0 and \
-                    (enemy.position[1] - self.position[1]) > abs(self.position[0] - enemy.position[0]):
-                    return True
-            return False
-        if direction_looking == 90:
-            for enemy in self.game_environment.enemies:
-                if ((enemy.position[0] - self.position[0]) < self.enemy_near_length * self.sprite_size) and \
-                    (enemy.position[0] - self.position[0]) > 0 and \
-                    (enemy.position[0] - self.position[0]) > abs(self.position[1] - enemy.position[1]):
-                    return True
-            return False
-        if direction_looking == 270:
-            for enemy in self.game_environment.enemies:
-                if ((self.position[0] - enemy.position[0]) < self.enemy_near_length * self.sprite_size) and \
-                    (self.position[0] - enemy.position[0]) > 0 and \
-                    (self.position[0] - enemy.position[0]) > abs(self.position[1] - enemy.position[1]):
-                    return True
-            return False
+        for enemy in self.game_environment.enemies:
+            polar_coords = Sprite.polar(enemy.position[0] - self.position[0] ,enemy.position[1] - self.position[1])
+            print polar_coords, direction_looking
+            if polar_coords[0] < (self.enemy_near_length * self.sprite_size) and \
+                abs(polar_coords[1] - direction_looking) < self.enemy_near_angle:
+                return True
+        return False
 
-
-
+    @staticmethod
+    def polar(x, y):
+        return math.hypot(x,y), math.degrees(math.atan2(x, y)) % 360
 
     def wall_front(self):
         if self.direction == 0 and self.position[1] < self.sprite_size:
