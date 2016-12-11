@@ -45,16 +45,19 @@ class RobotAlgorithm:
         self.i = self.i + 1
             
     def __evaluate(self, condition):
+        value = not condition.startswith('!')
+        condition = condition.strip('!')
+    
         if condition == 'el':
-            return self.robot.enemy_left()
+            return self.robot.enemy_left() == value
         if condition == 'er':
-            return self.robot.enemy_right()
+            return self.robot.enemy_right() == value
         if condition == 'ef':
-            return self.robot.enemy_front()
+            return self.robot.enemy_front() == value
             
         return False    
             
-    def __compile(self, block, result):
+    def __compile(self, block, result, entry_condition=None):
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
             func = statement[0]
@@ -62,12 +65,7 @@ class RobotAlgorithm:
             
             if func == 'end':
                 return
-            
-            if func <> 'if':
-                count = int(arg) if arg <> '' else 1
-                for _ in range(count):
-                    result.append((func).strip())
-            else:
+            elif func == 'if':
                 section = list(reversed(block))
                 ifs = []
                 skip = 0
@@ -85,6 +83,11 @@ class RobotAlgorithm:
                         
                         ends = ends + 1    
                         ifs.pop()
+                    elif inner_cmd == 'else':
+                        if not ifs:
+                            break
+                            
+                        ifs.pop()
                     elif len(inner) > 1:
                         inner_arg = inner[1]
                         repeats = repeats + int(inner_arg) - 1
@@ -92,7 +95,43 @@ class RobotAlgorithm:
                     skip = skip + 1
                     
                 result.append((func + ' ' + arg + ' ' + str(skip - ends + repeats)).strip())
+                self.__compile(block, result, arg)
+            elif func == 'else':
+                section = list(reversed(block)) #TODO method
+                ifs = []
+                skip = 0
+                ends = 0
+                repeats = 0
+                for skip in range(0, len(section) - 1):
+                    inner = filter(None, section[skip].split(' '))
+                    inner_cmd = inner[0]
+                    
+                    if inner_cmd == 'if':
+                        ifs.insert(0, True)
+                    elif inner_cmd == 'end':
+                        if not ifs:
+                            break
+                        
+                        ends = ends + 1    
+                        ifs.pop()
+                    elif inner_cmd == 'else':
+                        if not ifs:
+                            break
+                        
+                        ifs.pop()
+                    elif len(inner) > 1:
+                        inner_arg = inner[1]
+                        repeats = repeats + int(inner_arg) - 1
+                    
+                    skip = skip + 1
+            
+                result.append(('if !' + entry_condition + ' ' + str(skip - ends + repeats)).strip())
                 self.__compile(block, result)
+                return
+            else:
+                count = int(arg) if arg <> '' else 1
+                for _ in range(count):
+                    result.append((func).strip())
         
     def __get_commands_stack(self, raw_program):
         return list(reversed(list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))))

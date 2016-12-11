@@ -30,7 +30,12 @@ class Sprite:
         return self.front
 
 def assert_are_equal(expected, actual):
-   print inspect.stack()[1][3] + ': ' + ('Passed' if expected == actual else 'Failed')
+   test = inspect.stack()[1][3]
+   passed = expected == actual
+   if passed:
+       print test + ' passed'
+   else:
+       print test + ' failed\n\nExpected:\n' + str(expected) + '\n\nActual:\n' + str(actual)
 
 def test_basic_commands():
     # Arange
@@ -174,9 +179,68 @@ def test_nested_if_with_repeat():
         
     assert_are_equal(['mv 1', 'mv 1', 'r -90', 'sh 15', 'sh 15', 'r 90', 'r 90', 'r 90', 'sh 15', 'r -90', 'r 90', 'r 90', 'r 90'], robot.get_commands())    
 
+def test_if_else():
+    # Arrange
+    input = """
+    fd
+    if el
+        rl 2
+    else
+        rr
+        fd
+    end
+    sh
+    if er
+        fd
+    else
+        rr
+    end
+    sh
+    """
+    robot = Sprite(left=False, right=True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(6):
+        algo.run_next_command()
+        
+    assert_are_equal(['mv 1', 'r 90', 'mv 1', 'sh 15', 'mv 1', 'sh 15'], robot.get_commands())
+    
+def test_nested_if_else(left, right, forward, expected):
+    # Arrange
+    input = """
+    fd
+    if el
+        rl
+        sh 2
+    else
+        if er
+            rr
+            sh 3
+        else
+            if ef
+                sh 4
+            end
+        end
+    end
+    fd
+    """
+    robot = Sprite(left, right, forward)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    for _ in range(len(expected)):
+        algo.run_next_command()
+        
+    assert_are_equal(expected, robot.get_commands())
+
 test_basic_commands()
 test_repeat_arg()
 test_if()
 test_nested_if()
 test_if_with_repeat()
 test_nested_if_with_repeat()
+test_if_else()
+test_nested_if_else(True, True, True, ['mv 1', 'r -90', 'sh 15', 'sh 15', 'mv 1'])
+test_nested_if_else(False, True, True, ['mv 1', 'r 90', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
+test_nested_if_else(False, False, True, ['mv 1', 'sh 15', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
