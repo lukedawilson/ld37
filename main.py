@@ -331,12 +331,13 @@ bullet_img.fill(black)
 
 
 class GameEnvironment:
-    def __init__(self, level):
+    def __init__(self, level, friendly_fire):
         self.robots = []
         self.bullets = []
         self.enemies = []
         self.algos = []
         self.level = level
+        self.friendly_fire = friendly_fire
 
 
     def run_next_algo_command(self):
@@ -362,6 +363,13 @@ class GameEnvironment:
                     (enemy.position[1] - 2 <= bullet.position[1] <= enemy.position[1] + 19):
                     self.bullets[i].dead = True
                     self.enemies[j].dead = True
+        if self.friendly_fire:
+            for i, bullet in enumerate(self.bullets):
+                for j, robot in enumerate(self.robots):
+                    if (robot.position[0] - 2 <= bullet.position[0] <= robot.position[0] + 19) and \
+                        (robot.position[1] - 2 <= bullet.position[1] <= robot.position[1] + 19):
+                        self.bullets[i].dead = True
+                        self.robots[j].dead = True
         for j, enemy in enumerate(self.enemies):
             for k, robot in enumerate(self.robots):
                 if (enemy.position[0] - 10 <= robot.position[0] <= enemy.position[0] + 10) and \
@@ -434,7 +442,7 @@ def game_level(level, text, no_of_robots, no_of_enemies, enemy_inc, manual_contr
 
     run_game = True
     fps = 30
-    game_environment = GameEnvironment(level)
+    game_environment = GameEnvironment(level, friendly_fire)
 
 
 
