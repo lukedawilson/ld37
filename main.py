@@ -107,8 +107,8 @@ def level_complete():
     sleep(3)
 
 def start_game():
-    s.fill(white)
-    message_to_screen('Press return to start', black)
+    s.fill(black)
+    message_to_screen('Press return to start', yellow)
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
@@ -118,8 +118,8 @@ def start_game():
             if event.key == K_RETURN:
                 return
 def pause():
-    message_to_screen('Paused', black, size='large')
-    message_to_screen('Press space or p to start', black, y_displace=100)
+    message_to_screen('Paused', yellow, size='large')
+    message_to_screen('Press space or p to start', yellow, y_displace=100)
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
@@ -133,11 +133,13 @@ def pause():
         clock.tick(5)
 
 def game_intro():
-    s.fill(white)
-    message_to_screen('Welcome to', green, -170, 'medium')
-    message_to_screen('Progotron', green, -100, 'large')
-    message_to_screen('Kill enemy robots', black)
-    message_to_screen('Press return to play again, q to quit', black, 150)
+    s.fill(black)
+    s.blit(title_img, [130, 100])
+    s.blit(subtitle_img, [315, 170])
+    message_to_screen('Created by', yellow)
+    message_to_screen('Luke Wilson, Nathan Varughese and Matthew Varughese', yellow, 30)
+    message_to_screen('Program your robots to shoot down the enemy robots', yellow, 200)
+    message_to_screen('Press return to play, q to quit', blue, 250)
     pygame.display.update()
     while True:
         for event in pygame.event.get():
@@ -153,17 +155,93 @@ def game_intro():
 
         clock.tick(5)
 
-def message_to_screen(msg, colour, y_displace=0, size='small'):
+def print_input_screen(text, cursor_pos):
+    s.fill(black)
+    message_to_screen('Input command, press return to add', yellow, -250)
+    box_width, box_height = 400, 400
+    box_left, box_right = screen_w/2 - box_width/2, screen_w/2 + box_width/2
+    box_top, box_bottom = screen_h/2 - box_height/2, screen_h/2 + box_height/2
+    box_thickness = 2
+
+    new_text = text[:cursor_pos] + '_' + text[cursor_pos:]
+    lines = new_text.split('\n')
+    for i, line in enumerate(lines):
+        if '_' in line:
+            message_to_screen(line.split('_')[0] + line.split('_')[1], white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+            message_to_screen(line.split('_')[0] + '_', white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+        else:
+            message_to_screen(line, white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+    pygame.draw.line(s, white, (box_left, box_top), (box_right, box_top), box_thickness)
+    pygame.draw.line(s, white, (box_right, box_top), (box_right, box_bottom), box_thickness)
+    pygame.draw.line(s, white, (box_right, box_bottom), (box_left, box_bottom), box_thickness)
+    pygame.draw.line(s, white, (box_left, box_bottom), (box_left, box_top), box_thickness)
+
+    pygame.display.update()
+
+def program_input():
+
+    cursor_pos = 0
+    text = ''
+    print_input_screen(text, cursor_pos)
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == KEYDOWN:
+                if event.key == K_RETURN:
+                    text = text[:cursor_pos] + '\n' + tabs(text[:cursor_pos]) * '    ' + text[cursor_pos:]
+                    cursor_pos += tabs(text) * 4 + 1
+                elif event.key == K_BACKSPACE:
+                    if cursor_pos > 0:
+                        text = text[:cursor_pos-1] + text[cursor_pos:]
+                        cursor_pos -= 1
+                elif event.key == K_TAB:
+                    text = text[:cursor_pos] + '    ' + text[cursor_pos:]
+                    cursor_pos += 4
+                elif event.key == K_LEFT:
+                    cursor_pos -= 1
+                elif event.key == K_RIGHT:
+                    cursor_pos += 1
+                elif event.key == K_ESCAPE:
+                    return text
+                elif event.key < 127:
+                    text = text[:cursor_pos] + (chr(event.key)) + text[cursor_pos:]
+                    cursor_pos += 1
+
+                cursor_pos = max(0, min(cursor_pos, len(text)))
+                print_input_screen(text, cursor_pos)
+
+        clock.tick(5)
+
+def tabs(text):
+    tabs = 0
+    lines = text.split('\n')
+    for line in lines:
+        words = line.split(' ')
+        for word in words:
+            if word == 'if':
+                tabs += 1
+            elif word == 'end':
+                tabs -= 1
+    return tabs
+
+def message_to_screen(msg, colour, y_displace=0, size='small', buffer_left=0, buffer_top=0, align='centre', update=True):
     if size == 'small':
         text_surf = smallfont.render(msg, True, colour)
     elif size == 'medium':
         text_surf = medfont.render(msg, True, colour)
     elif size == 'large':
         text_surf = largefont.render(msg, True, colour)
-    text_rect = text_surf.get_rect()
-    text_rect.center = (screen_w / 2, (screen_h / 2) + y_displace)
-    s.blit(text_surf, text_rect)
-    pygame.display.update()
+
+    if align != 'centre':
+        s.blit(text_surf, (buffer_left, buffer_top + y_displace))
+    else:
+        text_rect = text_surf.get_rect()
+        text_rect.center = (screen_w / 2, (screen_h / 2) + y_displace)
+        s.blit(text_surf, text_rect)
+    if update:
+        pygame.display.update()
 
 
 
@@ -185,6 +263,8 @@ medfont = pygame.font.SysFont('comicsansms', 50)
 largefont = pygame.font.SysFont('comicsansms', 80)
 
 
+title_img = pygame.image.load('progrotron_title.png')
+subtitle_img = pygame.image.load('2084.png')
 
 img = pygame.Surface((20, 20))
 img.fill(white)
@@ -290,14 +370,15 @@ class GameEnvironment:
 def game():
     while True:
         game_intro()
+        text = program_input()
         level = 1
         no_of_robots = 4
         level_outcome = 'success'
         while level_outcome == 'success':
-            level_outcome, no_of_robots = game_level(level, no_of_robots)
+            level_outcome, no_of_robots = game_level(level, no_of_robots, text)
             level += 1
 
-def game_level(level, no_of_robots):
+def game_level(level, no_of_robots, text):
 
 
 
@@ -323,7 +404,7 @@ def game_level(level, no_of_robots):
         y_start_position = 0.6 * rand_y * screen_h + 0.2 * screen_h
         robot = Sprite(game_environment, type='robot', x_position=x_start_position, y_position=y_start_position)
         game_environment.robots.append(robot)
-        algo = RobotAlgorithm(robot, input3)
+        algo = RobotAlgorithm(robot, text)
         game_environment.algos.append(algo)
 
 
@@ -387,8 +468,8 @@ def game_level(level, no_of_robots):
         pygame.draw.line(s, yellow, (screen_w - side_buffer, top_bottom_buffer), (screen_w - side_buffer, screen_h - top_bottom_buffer), border_thickness)
         pygame.draw.line(s, yellow, (screen_w - side_buffer, screen_h - top_bottom_buffer), (side_buffer, screen_h - top_bottom_buffer), border_thickness)
         pygame.draw.line(s, yellow, (side_buffer, screen_h - top_bottom_buffer), (side_buffer, top_bottom_buffer), border_thickness)
-        message_to_screen(str(no_of_robots) + ' robots', red, -screen_h / 2 + top_bottom_buffer / 2)
-        message_to_screen(str(level) + ' wave', red, screen_h / 2 - top_bottom_buffer / 2)
+        message_to_screen(str(no_of_robots) + ' robots', red, -screen_h / 2 + top_bottom_buffer / 2, update=False)
+        message_to_screen(str(level) + ' wave', red, screen_h / 2 - top_bottom_buffer / 2, update=False)
         for bullet in game_environment.bullets:
             bullet.update_for_velocity()
             s.blit(bullet.img, bullet.position)
