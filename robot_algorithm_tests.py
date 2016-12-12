@@ -38,12 +38,6 @@ class Sprite:
     def friend_front(self):
         return self.front
         
-    def wall_left(self):
-        return self.left
-        
-    def wall_right(self):
-        return self.right
-        
     def wall_front(self):
         return self.front 
 
@@ -117,7 +111,7 @@ def test_nested_if():
     # Arrange
     input = """
     fd
-    if wl
+    if el
         rl
         sh
         if er

@@ -71,10 +71,6 @@ class RobotAlgorithm:
             return self.robot.friend_right() == value
         if condition == 'ff':
             return self.robot.friend_front() == value
-        if condition == 'wl':
-            return self.robot.wall_left() == value
-        if condition == 'wr':
-            return self.robot.wall_right() == value
         if condition == 'wf':
             return self.robot.wall_front() == value
                             
