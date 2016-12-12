@@ -359,6 +359,8 @@ def game_level(level, no_of_robots):
         pygame.draw.line(s, yellow, (screen_w - side_buffer, top_bottom_buffer), (screen_w - side_buffer, screen_h - top_bottom_buffer), border_thickness)
         pygame.draw.line(s, yellow, (screen_w - side_buffer, screen_h - top_bottom_buffer), (side_buffer, screen_h - top_bottom_buffer), border_thickness)
         pygame.draw.line(s, yellow, (side_buffer, screen_h - top_bottom_buffer), (side_buffer, top_bottom_buffer), border_thickness)
+        message_to_screen(str(no_of_robots) + ' robots', red, -screen_h / 2 + top_bottom_buffer / 2)
+        message_to_screen(str(level) + ' wave', red, screen_h / 2 - top_bottom_buffer / 2)
         for bullet in game_environment.bullets:
             bullet.update_for_velocity()
             s.blit(bullet.img, bullet.position)

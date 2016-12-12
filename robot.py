@@ -5,6 +5,7 @@ import math
 
 
 screen_w, screen_h = 800, 600
+top_bottom_buffer, side_buffer, border_thickness = 50, 5, 3
 black = (0, 0, 0)
 white = (255, 255, 255)
 bullet_img = pygame.Surface((3, 3))
@@ -106,11 +107,11 @@ class Sprite:
             self.position[0] -= move_distance
         self.check_for_walls()
     def check_for_walls(self):
-        if (self.position[0] < 5) or (self.position[0] > screen_w - self.sprite_size - 5):
-            self.position[0] = max(5, min(screen_w - self.sprite_size - 5, self.position[0]))
+        if (self.position[0] < side_buffer) or (self.position[0] > screen_w - self.sprite_size - side_buffer):
+            self.position[0] = max(side_buffer, min(screen_w - self.sprite_size - side_buffer, self.position[0]))
             self.hit_wall = True
-        if (self.position[1] < 50) or (self.position[1] > screen_h - self.sprite_size - 50):
-            self.position[1] = max(50, min(screen_h - self.sprite_size - 50, self.position[1]))
+        if (self.position[1] < top_bottom_buffer) or (self.position[1] > screen_h - self.sprite_size - top_bottom_buffer):
+            self.position[1] = max(top_bottom_buffer, min(screen_h - self.sprite_size - top_bottom_buffer, self.position[1]))
             self.hit_wall = True
     def update_for_velocity(self):
         self.move_forward_by(self.velocity)
