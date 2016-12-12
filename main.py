@@ -205,9 +205,36 @@ def setting_screen(robots, enemies, enemy_inc, manual_control, friendly_fire):
 def print_input_screen(text, cursor_pos):
     s.fill(black)
     message_to_screen('Input command, press escape when done', yellow, -250, update=False)
-    box_width, box_height = 400, 400
-    box_left, box_right = screen_w/2 - box_width/2, screen_w/2 + box_width/2
-    box_top, box_bottom = screen_h/2 - box_height/2, screen_h/2 + box_height/2
+
+    message_to_screen('Basic commands:', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=100, update=False)
+    message_to_screen('fd n: move forward n times', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=120, update=False)
+    message_to_screen('rl n: rotate left n times', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=140, update=False)
+    message_to_screen('rl n: rotate right n times', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=160, update=False)
+    message_to_screen('sh n: shoot n times', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=180, update=False)
+
+    message_to_screen('if-else-syntax:', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=220, update=False)
+    message_to_screen('if <condition>', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=240, update=False)
+    message_to_screen('   ...', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=260, update=False)
+    message_to_screen('else', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=280, update=False)
+    message_to_screen('   ...', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=300, update=False)
+    message_to_screen('end', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=320, update=False)
+
+    message_to_screen('Conditions:', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=360, update=False)
+    message_to_screen('el/er/ef: enemy l/r/f', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=380, update=False)
+    message_to_screen('fl/fr/ff: friend l/r/f', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=400, update=False)
+    message_to_screen('wf:  wall in front', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=420, update=False)
+
+    message_to_screen('Example:', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=460, update=False)
+    message_to_screen('if el', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=480, update=False)
+    message_to_screen('   rl', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=500, update=False)
+    message_to_screen('else', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=520, update=False)
+    message_to_screen('   fd 5', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=540, update=False)
+    message_to_screen('end', blue, 0, size='xsmall', align='left', buffer_left=470, buffer_top=560, update=False)
+
+
+    box_width, box_height = 400, 470
+    box_left, box_right = 50, 50 + box_width
+    box_top, box_bottom = 100, 100 + box_height
     box_thickness = 2
 
     new_text = text[:cursor_pos] + '_' + text[cursor_pos:]
@@ -275,7 +302,9 @@ def tabs(text):
 
 def message_to_screen(msg, colour, y_displace=0, size='small', buffer_left=0, buffer_top=0, align='centre', update=True):
     msg = msg.upper()
-    if size == 'small':
+    if size == 'xsmall':
+        text_surf = xsmallfont.render(msg, True, colour)
+    elif size == 'small':
         text_surf = smallfont.render(msg, True, colour)
     elif size == 'medium':
         text_surf = medfont.render(msg, True, colour)
@@ -306,6 +335,7 @@ top_bottom_buffer, side_buffer, border_thickness = 50, 5, 3
 pygame.init()
 s = pygame.display.set_mode((screen_w, screen_h))
 clock = pygame.time.Clock()
+xsmallfont = pygame.font.SysFont('consolas', 20)
 smallfont = pygame.font.SysFont('consolas', 25)
 medfont = pygame.font.SysFont('consolas', 50)
 largefont = pygame.font.SysFont('consolas', 80)
