@@ -64,7 +64,7 @@ if ef
 else
     if el
         rl
-        sh3
+        sh 3
     else
         if er
             rr
