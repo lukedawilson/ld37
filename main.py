@@ -40,14 +40,14 @@ if ef
     sh 3
 end
 if er
-    tr
+    rr
     sh 3
-    tl
+    rl
 end
 if el
-    tl
+    rl
     sh 3
-    tr
+    rr
 end
 if ff
     sh 3
