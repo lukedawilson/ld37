@@ -152,8 +152,55 @@ def game_intro():
                     quit()
                 elif event.key == K_RETURN:
                     return
+        clock.tick(5)
+
+def print_settings_screen(robots, enemies, enemy_inc, manual_control, friendly_fire):
+    s.fill(black)
+    message_to_screen('Settings, escape to continue', blue, -250, update=False)
+    message_to_screen('Robots (press q, w): ' + str(robots), yellow, -50, update=False)
+    message_to_screen('Enemies (press a, s): ' + str(enemies), yellow, 0, update=False)
+    message_to_screen('Enemy increase per level (press z, x): ' + str(enemy_inc), yellow, 50, update=False)
+    message_to_screen('Manually control robots(press m): ' + str(manual_control), yellow, 100, update=False)
+    message_to_screen('Friendly fire kills(press f): ' + str(friendly_fire), yellow, 150, update=False)
+    pygame.display.update()
+
+def setting_screen(robots, enemies, enemy_inc, manual_control, friendly_fire):
+
+    print_settings_screen(robots, enemies, enemy_inc, manual_control, friendly_fire)
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == KEYDOWN:
+                if event.key == K_q:
+                    robots -= 1
+                    robots = max(1, robots)
+                elif event.key == K_w:
+                    robots += 1
+                elif event.key == K_a:
+                    enemies -= 1
+                    enemies = max(1, enemies)
+                elif event.key == K_s:
+                    enemies += 1
+                elif event.key == K_z:
+                    enemy_inc -= 1
+                    enemy_inc = max(0, enemy_inc)
+                elif event.key == K_x:
+                    enemy_inc +=1
+                elif event.key == K_m:
+                    manual_control = not manual_control
+                elif event.key == K_f:
+                    friendly_fire = not friendly_fire
+                elif event.key == K_ESCAPE:
+                    return robots, enemies, enemy_inc, manual_control, friendly_fire
+
+                print_settings_screen(robots, enemies, enemy_inc, manual_control, friendly_fire)
 
         clock.tick(5)
+
+
+
 
 def print_input_screen(text, cursor_pos):
     s.fill(black)
@@ -372,15 +419,16 @@ class GameEnvironment:
 def game():
     while True:
         game_intro()
+        robots, enemies, enemy_inc, manual_control, friendly_fire = setting_screen(4, 8, 2, False, False)
         text = program_input()
         level = 1
         no_of_robots = 4
         level_outcome = 'success'
         while level_outcome == 'success':
-            level_outcome, no_of_robots = game_level(level, no_of_robots, text)
+            level_outcome, no_of_robots = game_level(level, text, robots, enemies, enemy_inc, manual_control, friendly_fire)
             level += 1
 
-def game_level(level, no_of_robots, text):
+def game_level(level, text, no_of_robots, no_of_enemies, enemy_inc, manual_control, friendly_fire):
 
 
 
@@ -413,7 +461,7 @@ def game_level(level, no_of_robots, text):
 
 
 
-    for i in range(level + 5):
+    for i in range(no_of_enemies + (level - 1) * enemy_inc):
         rand_x = random.random()
         rand_y = random.random()
         x_start_position = rand_x * (screen_w - 20 - side_buffer * 2) + side_buffer
