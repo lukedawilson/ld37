@@ -471,12 +471,13 @@ def game_level(level, text, no_of_robots, no_of_enemies, enemy_inc, manual_contr
 
 
     up_down = 0 # = 1 if up is pressed, -1 if down is pressed, 0 if neither or both
-    shoot = False
+
 
 
     while run_game:
         clock.tick(fps)
 
+        shoot = False
         rotate = 0
         for e in pygame.event.get():
             if e.type == QUIT:
@@ -503,11 +504,12 @@ def game_level(level, text, no_of_robots, no_of_enemies, enemy_inc, manual_contr
 
 
         game_environment.run_next_algo_command()
-        for robot in game_environment.robots:
-            robot.rotate(rotate)
-            robot.move_forward(up_down)
-            if shoot:
-                robot.shoot()
+        if manual_control:
+            for robot in game_environment.robots:
+                robot.rotate(rotate)
+                robot.move_forward(up_down)
+                if shoot:
+                    robot.shoot()
 
         shoot = False
 
