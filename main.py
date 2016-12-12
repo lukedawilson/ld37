@@ -87,9 +87,9 @@ end
 """
 
 
-def die(score = 0):
+def die(level):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
-    message_to_screen('Your score was: '+str(score)+', press return to play again, q to quit', red)
+    message_to_screen('level reached: '+str(level)+', press return to play again, q to quit', red)
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
@@ -157,7 +157,7 @@ def game_intro():
 
 def print_input_screen(text, cursor_pos):
     s.fill(black)
-    message_to_screen('Input command, press return to add', yellow, -250)
+    message_to_screen('Input command, press escape when done', yellow, -250, update=False)
     box_width, box_height = 400, 400
     box_left, box_right = screen_w/2 - box_width/2, screen_w/2 + box_width/2
     box_top, box_bottom = screen_h/2 - box_height/2, screen_h/2 + box_height/2
@@ -224,9 +224,10 @@ def tabs(text):
                 tabs += 1
             elif word == 'end':
                 tabs -= 1
-    return tabs
+    return max(0, tabs)
 
 def message_to_screen(msg, colour, y_displace=0, size='small', buffer_left=0, buffer_top=0, align='centre', update=True):
+    msg = msg.upper()
     if size == 'small':
         text_surf = smallfont.render(msg, True, colour)
     elif size == 'medium':
@@ -258,9 +259,9 @@ top_bottom_buffer, side_buffer, border_thickness = 50, 5, 3
 pygame.init()
 s = pygame.display.set_mode((screen_w, screen_h))
 clock = pygame.time.Clock()
-smallfont = pygame.font.SysFont('comicsansms', 25)
-medfont = pygame.font.SysFont('comicsansms', 50)
-largefont = pygame.font.SysFont('comicsansms', 80)
+smallfont = pygame.font.SysFont('consolas', 25)
+medfont = pygame.font.SysFont('consolas', 50)
+largefont = pygame.font.SysFont('consolas', 80)
 
 
 title_img = pygame.image.load('progrotron_title.png')
@@ -283,11 +284,12 @@ bullet_img.fill(black)
 
 
 class GameEnvironment:
-    def __init__(self):
+    def __init__(self, level):
         self.robots = []
         self.bullets = []
         self.enemies = []
         self.algos = []
+        self.level = level
 
 
     def run_next_algo_command(self):
@@ -299,7 +301,7 @@ class GameEnvironment:
         self.clean_up_enemies()
         self.clean_up_robots()
         if len(self.robots) == 0:
-            die()
+            die(self.level)
             return 'die', len(self.robots)
         if len(self.enemies) == 0:
             level_complete()
@@ -384,7 +386,7 @@ def game_level(level, no_of_robots, text):
 
     run_game = True
     fps = 30
-    game_environment = GameEnvironment()
+    game_environment = GameEnvironment(level)
 
 
 

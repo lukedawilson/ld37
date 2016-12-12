@@ -5,6 +5,7 @@ class RobotRuntimeException(BaseException):
 
 class RobotAlgorithm:
     def __init__(self, robot, raw_program):
+        raw_program = raw_program.lower()
         self.robot = robot
         
         commands = self.__to_commands_list(raw_program)
@@ -14,8 +15,11 @@ class RobotAlgorithm:
         self.current_step = 0
         
     def run_next_command(self):
-        if self.current_step >= len(self.program):
-            self.current_step = 0   
+        if len(self.program) == 0:
+            return
+
+        if self.i >= len(self.program):
+            self.i = 0   
     
         statement = self.program[self.current_step]
         cmd = statement[0]
