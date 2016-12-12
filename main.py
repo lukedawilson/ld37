@@ -58,6 +58,34 @@ rr
 
 """
 
+input3 = """
+if ef
+    sh 3
+else
+    if el
+        rl
+        sh3
+    else
+        if er
+            rr
+            sh 3
+        else
+            if wf
+                rr 2
+                fd 3
+            else
+                if ff
+                    rl
+                    fd 2
+                else
+                    fd 3
+                end
+            end
+        end
+    end
+end
+"""
+
 
 def die(score = 0):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
@@ -295,7 +323,7 @@ def game_level(level, no_of_robots):
         y_start_position = 0.6 * rand_y * screen_h + 0.2 * screen_h
         robot = Sprite(game_environment, type='robot', x_position=x_start_position, y_position=y_start_position)
         game_environment.robots.append(robot)
-        algo = RobotAlgorithm(robot, input2)
+        algo = RobotAlgorithm(robot, input3)
         game_environment.algos.append(algo)
 
 
