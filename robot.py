@@ -165,16 +165,16 @@ class Sprite:
 
     @staticmethod
     def polar(x, y): # returns distance, degrees angle
-        return math.hypot(x,y), math.degrees(math.atan2(x, y)) % 360
+        return math.hypot(x, y), math.degrees(math.atan2(x, y)) % 360
 
-    def wall_front(self):
-        if self.direction == 0 and self.position[1] < self.sprite_size:
+    def wall_front(self):  # pos 0 = x, 1 = y; dirn 0 = up
+        if self.direction == 0 and self.position[1] < self.sprite_size + top_bottom_buffer:
             return True
-        elif self.direction == 90 and self.position[0] > screen_w - self.sprite_size - self.sprite_size:
+        elif self.direction == 90 and self.position[0] > screen_w - 2*self.sprite_size - side_buffer:
             return True
-        elif self.direction == 270 and self.position[0] < self.sprite_size:
+        elif self.direction == 270 and self.position[0] < self.sprite_size + side_buffer:
             return True
-        elif self.direction == 180 and self.position[1] > screen_h - self.sprite_size - self.sprite_size:
+        elif self.direction == 180 and self.position[1] > screen_h - 2*self.sprite_size - top_bottom_buffer:
             return True
         else:
             return False
