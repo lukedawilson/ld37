@@ -156,12 +156,16 @@ def game_intro():
 
 def print_settings_screen(robots, enemies, enemy_inc, manual_control, friendly_fire):
     s.fill(black)
-    message_to_screen('Settings, escape to continue', blue, -250, update=False)
-    message_to_screen('Robots (press q, w): ' + str(robots), yellow, -50, update=False)
-    message_to_screen('Enemies (press a, s): ' + str(enemies), yellow, 0, update=False)
-    message_to_screen('Enemy increase per level (press z, x): ' + str(enemy_inc), yellow, 50, update=False)
-    message_to_screen('Manually control robots(press m): ' + str(manual_control), yellow, 100, update=False)
-    message_to_screen('Friendly fire kills(press f): ' + str(friendly_fire), yellow, 150, update=False)
+    message_to_screen('Settings, escape to continue', blue, -200, update=False)
+    message_to_screen('Robots (press q, w): ' + str(robots), yellow, -150, update=False)
+    message_to_screen('Enemies (press a, s): ' + str(enemies), yellow, -100, update=False)
+    message_to_screen('Enemy increase per level (press z, x): ' + str(enemy_inc), yellow, -50, update=False)
+    message_to_screen('Friendly fire kills(press f): ' + str(friendly_fire), yellow, 0, update=False)
+    message_to_screen('Manually control robots(press m): ' + str(manual_control), yellow, 50, update=False)
+    message_to_screen('Manual controls:', blue, 100,size='xsmall', update=False)
+    message_to_screen('left/right arrow: rotate', blue, 125,size='xsmall', update=False)
+    message_to_screen('up/down arrow: forward/back', blue, 150,size='xsmall', update=False)
+    message_to_screen('space: shoot', blue, 175,size='xsmall', update=False)
     pygame.display.update()
 
 def setting_screen(robots, enemies, enemy_inc, manual_control, friendly_fire):
@@ -252,10 +256,9 @@ def print_input_screen(text, cursor_pos):
 
     pygame.display.update()
 
-def program_input():
+def program_input(text):
 
-    cursor_pos = 0
-    text = ''
+    cursor_pos = len(text)
     print_input_screen(text, cursor_pos)
     while True:
         for event in pygame.event.get():
@@ -455,10 +458,11 @@ class GameEnvironment:
 
 
 def game():
+    text = ''
     while True:
         game_intro()
         robots, enemies, enemy_inc, manual_control, friendly_fire = setting_screen(4, 8, 2, False, False)
-        text = program_input()
+        text = program_input(text)
         level = 1
         no_of_robots = 4
         level_outcome = 'success'
