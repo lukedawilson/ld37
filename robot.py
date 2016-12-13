@@ -67,7 +67,7 @@ class Sprite:
         self.type = type
         self.animation = 0
         self.animation_pause = 0
-        self.enemy_near_length = 20
+        self.enemy_near_length = 4
         self.enemy_near_angle = 15
     def animate_img(self):
         if self.animation_pause == 0:

@@ -245,10 +245,10 @@ def print_input_screen(text, cursor_pos):
     lines = new_text.split('\n')
     for i, line in enumerate(lines):
         if '_' in line:
-            message_to_screen(line.split('_')[0] + line.split('_')[1], white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
-            message_to_screen(line.split('_')[0] + '_', white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+            message_to_screen(line.split('_')[0] + line.split('_')[1], white, i * 20,size='xsmall', buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+            message_to_screen(line.split('_')[0] + '_', white, i * 20, size='xsmall', buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
         else:
-            message_to_screen(line, white, i * 30, buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
+            message_to_screen(line, white, i * 20, size='xsmall', buffer_top=box_top + 5, buffer_left=box_left + 10, align='left', update=False)
     pygame.draw.line(s, white, (box_left, box_top), (box_right, box_top), box_thickness)
     pygame.draw.line(s, white, (box_right, box_top), (box_right, box_bottom), box_thickness)
     pygame.draw.line(s, white, (box_right, box_bottom), (box_left, box_bottom), box_thickness)
@@ -464,10 +464,9 @@ def game():
         robots, enemies, enemy_inc, manual_control, friendly_fire = setting_screen(4, 8, 2, False, False)
         text = program_input(text)
         level = 1
-        no_of_robots = 4
         level_outcome = 'success'
         while level_outcome == 'success':
-            level_outcome, no_of_robots = game_level(level, text, robots, enemies, enemy_inc, manual_control, friendly_fire)
+            level_outcome, robots = game_level(level, text, robots, enemies, enemy_inc, manual_control, friendly_fire)
             level += 1
 
 def game_level(level, text, no_of_robots, no_of_enemies, enemy_inc, manual_control, friendly_fire):
