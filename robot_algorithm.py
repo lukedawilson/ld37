@@ -2,9 +2,10 @@ class RobotAlgorithm:
     def __init__(self, robot, raw_program):
         self.robot = robot
         
-        stack = self.__get_commands_stack(raw_program)
-        self.program = []
-        self.__compile(list(stack), self.program)
+        commands = self.__to_commands_list(raw_program)
+        stack = self.__to_stack(commands)
+        
+        self.program = self.__translate(list(stack), [])
         
         self.i = 0
         
@@ -69,27 +70,29 @@ class RobotAlgorithm:
                             
         return False    
             
-    def __compile(self, block, result, entry_condition=None):
+    def __translate(self, block, result, entry_condition=None):
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
             func = statement[0]
             arg = statement[1] if len(statement) > 1 else ''
             
             if func == 'end':
-                return
+                return result
             elif func == 'if':
                 skip = self.__get_if_block_length(block)    
                 result.append('{} {} {}'.format(func, arg, str(skip)).strip())
-                self.__compile(block, result, arg)
+                self.__translate(block, result, arg)
             elif func == 'else':
                 skip = self.__get_if_block_length(block)
                 result.append('if !{} {}'.format(entry_condition, str(skip)).strip())
-                self.__compile(block, result)
-                return
+                self.__translate(block, result)
+                return result
             else:
                 count = int(arg) if arg <> '' else 1
                 for _ in range(count):
                     result.append((func).strip())
+                    
+        return result
                     
     def __get_if_block_length(self, block):
         section = list(reversed(block))
@@ -122,5 +125,8 @@ class RobotAlgorithm:
         
         return skip - ends + repeats
         
-    def __get_commands_stack(self, raw_program):
-        return list(reversed(list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))))
+    def __to_stack(self, collection):
+        return list(reversed(collection))
+        
+    def __to_commands_list(self, raw_program):
+        return list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))
