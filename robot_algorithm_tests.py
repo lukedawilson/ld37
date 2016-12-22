@@ -289,6 +289,41 @@ def test_bad_command():
         caught = True
         
     assert_are_equal(True, caught)
+    
+def test_bad_arg():
+    # Arrange
+    input = """
+    rl 5
+    rl 5x
+    rr 2
+    """
+    robot = Sprite()
+    
+    # Act
+    try:
+        algo = RobotAlgorithm(robot, input)
+    except RobotRuntimeException:
+        caught = True
+        
+    assert_are_equal(True, caught)
+    
+def test_bad_nested_arg():
+    # Arrange
+    input = """
+    if el
+        rl 5x
+    end
+    rr 2
+    """
+    robot = Sprite()
+    
+    # Act
+    try:
+        algo = RobotAlgorithm(robot, input)
+    except RobotRuntimeException:
+        caught = True
+        
+    assert_are_equal(True, caught)    
  
 test_basic_commands()
 test_repeat_arg()
@@ -302,3 +337,5 @@ test_nested_if_else(False, True, True, ['mv 1', 'r 90', 'sh 15', 'sh 15', 'sh 15
 test_nested_if_else(False, False, True, ['mv 1', 'sh 15', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
 test_bad_if_condition()
 test_bad_command()
+test_bad_arg()
+test_bad_nested_arg()

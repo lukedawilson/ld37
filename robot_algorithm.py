@@ -97,7 +97,11 @@ class RobotAlgorithm:
                 self.__translate(block, result)
                 return result
             else:
-                count = int(arg) if arg <> '' else 1
+                try:
+                    count = int(arg) if arg <> '' else 1
+                except ValueError:
+                    raise RobotRuntimeException('Invalid argument - {}. Expected argument of type int.'.format(arg))
+                    
                 for _ in range(count):
                     result.append([func.strip()])
                     
@@ -128,8 +132,12 @@ class RobotAlgorithm:
                 ifs -= 1
             elif len(inner) > 1:
                 inner_arg = inner[1]
-                repeats += (int(inner_arg) - 1)
-            
+                
+                try:
+                    repeats += (int(inner_arg) - 1)
+                except ValueError:
+                    raise RobotRuntimeException('Invalid argument - {}. Expected argument of type int.'.format(inner_arg))
+                    
             skip += 1
         
         return skip - ends + repeats
