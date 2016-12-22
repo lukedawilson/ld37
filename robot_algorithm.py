@@ -5,31 +5,30 @@ class RobotAlgorithm:
         commands = self.__to_commands_list(raw_program)
         stack = self.__to_stack(commands)
         
-        self.program = self.__translate(stack)
-        
-        self.i = 0
+        self.program = self.__translate(stack)        
+        self.current_step = 0
         
     def run_next_command(self):
-        if self.i >= len(self.program):
-            self.i = 0   
+        if self.current_step >= len(self.program):
+            self.current_step = 0   
     
-        statement = filter(None, self.program[self.i].split(' '))
+        statement = filter(None, self.program[self.current_step].split(' '))
         cmd = statement[0]
         arg = statement[1] if len(statement) > 1 else ''     
         skip = int(statement[2]) if len(statement) > 2 else 0
         
         while cmd == 'if':
-            self.i += 1
+            self.current_step += 1
             
             passed = self.__evaluate(arg)
             if passed == False:
-                self.i += skip
+                self.current_step += skip
                 
-            if self.i >= len(self.program):
+            if self.current_step >= len(self.program):
                 cmd = None
                 break
                 
-            statement = filter(None, self.program[self.i].split(' '))
+            statement = filter(None, self.program[self.current_step].split(' '))
             cmd = statement[0]
             arg = statement[1] if len(statement) > 1 else ''     
             skip = int(statement[2]) if len(statement) > 2 else 0
@@ -43,7 +42,7 @@ class RobotAlgorithm:
         elif cmd =='sh':
             self.robot.shoot(15)
             
-        self.i += 1
+        self.current_step += 1
             
     def __evaluate(self, condition):
         value = not condition.startswith('!')
