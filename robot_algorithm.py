@@ -8,7 +8,7 @@ class RobotAlgorithm:
         self.robot = robot
         
         commands = self.__to_commands_list(raw_program)
-        stack = self.__to_stack(commands)
+        stack = self.__list_to_stack(commands)
         
         self.program = self.__translate(stack)        
         self.current_step = 0
@@ -108,13 +108,12 @@ class RobotAlgorithm:
         return result
                     
     def __get_if_block_length(self, block):
-        section = list(reversed(block))
+        section = self.__stack_to_list(block)
         ifs = 0
-        skip = 0
         ends = 0
         repeats = 0
-        for skip in range(0, len(section) - 1):
-            inner = filter(None, section[skip].split(' '))
+        for i in range(0, len(section) - 1):
+            inner = filter(None, section[i].split(' '))
             inner_cmd = inner[0]
             
             if inner_cmd == 'if':
@@ -137,12 +136,13 @@ class RobotAlgorithm:
                     repeats += (int(inner_arg) - 1)
                 except ValueError:
                     raise RobotRuntimeException('Invalid argument - {}. Expected argument of type int.'.format(inner_arg))
-                    
-            skip += 1
+   
+        return i - ends + repeats
+    
+    def __stack_to_list(self, stack):
+        return list(reversed(stack))
         
-        return skip - ends + repeats
-        
-    def __to_stack(self, collection):
+    def __list_to_stack(self, collection):
         return list(reversed(collection)) # in Python, pop() removes the last entry of the list
         
     def __to_commands_list(self, raw_program):
