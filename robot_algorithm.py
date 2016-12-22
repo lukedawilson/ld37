@@ -20,7 +20,7 @@ class RobotAlgorithm:
         statement = self.program[self.current_step]
         cmd = statement[0]
         arg = statement[1] if len(statement) > 1 else ''     
-        skip = int(statement[2]) if len(statement) > 2 else 0
+        skip = statement[2] if len(statement) > 2 else 0
         
         while cmd == 'if':
             self.current_step += 1
@@ -46,6 +46,8 @@ class RobotAlgorithm:
             self.robot.move_forward()
         elif cmd =='sh':
             self.robot.shoot(15)
+        else:
+            raise RobotRuntimeException('Unknown command - {}'.format(cmd))
             
         self.current_step += 1
             
@@ -72,8 +74,8 @@ class RobotAlgorithm:
         if condition == 'wf':
             return self.robot.wall_front() == value
                             
-        raise RobotRuntimeException('Unknown condition - {}'.format(condition)) #TODO implement derived exception
-            
+        raise RobotRuntimeException('Unknown condition - {}'.format(condition))
+                    
     def __translate(self, block, result=None, entry_condition=None):
         if not result:
             result = []
@@ -87,11 +89,11 @@ class RobotAlgorithm:
                 return result
             elif func == 'if':
                 skip = self.__get_if_block_length(block)    
-                result.append([func, arg, str(skip)])
+                result.append([func, arg, skip])
                 self.__translate(block, result, arg)
             elif func == 'else':
                 skip = self.__get_if_block_length(block)
-                result.append(['if', '!{}'.format(entry_condition), str(skip)])
+                result.append(['if', '!{}'.format(entry_condition), skip])
                 self.__translate(block, result)
                 return result
             else:

@@ -270,6 +270,25 @@ def test_bad_if_condition():
         caught = True
         
     assert_are_equal(True, caught)
+    
+def test_bad_command():
+    # Arrange
+    input = """
+    rl
+    rlx
+    rr
+    """
+    robot = Sprite(True)
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    try:
+        for _ in range(3):
+            algo.run_next_command()
+    except RobotRuntimeException:
+        caught = True
+        
+    assert_are_equal(True, caught)
  
 test_basic_commands()
 test_repeat_arg()
@@ -282,3 +301,4 @@ test_nested_if_else(True, True, True, ['mv 1', 'r -90', 'sh 15', 'sh 15', 'mv 1'
 test_nested_if_else(False, True, True, ['mv 1', 'r 90', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
 test_nested_if_else(False, False, True, ['mv 1', 'sh 15', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
 test_bad_if_condition()
+test_bad_command()
