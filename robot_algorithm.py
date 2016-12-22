@@ -143,7 +143,7 @@ class RobotAlgorithm:
         return skip - ends + repeats
         
     def __to_stack(self, collection):
-        return list(reversed(collection))
+        return list(reversed(collection)) # in Python, pop() removes the last entry of the list
         
     def __to_commands_list(self, raw_program):
         return list(filter(None, map(lambda x: x.strip().lower(), raw_program.split('\n'))))
