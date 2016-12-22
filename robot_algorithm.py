@@ -12,7 +12,7 @@ class RobotAlgorithm:
         if self.current_step >= len(self.program):
             self.current_step = 0   
     
-        statement = filter(None, self.program[self.current_step].split(' '))
+        statement = self.program[self.current_step]
         cmd = statement[0]
         arg = statement[1] if len(statement) > 1 else ''     
         skip = int(statement[2]) if len(statement) > 2 else 0
@@ -28,7 +28,7 @@ class RobotAlgorithm:
                 cmd = None
                 break
                 
-            statement = filter(None, self.program[self.current_step].split(' '))
+            statement = self.program[self.current_step]
             cmd = statement[0]
             arg = statement[1] if len(statement) > 1 else ''     
             skip = int(statement[2]) if len(statement) > 2 else 0
@@ -82,17 +82,17 @@ class RobotAlgorithm:
                 return result
             elif func == 'if':
                 skip = self.__get_if_block_length(block)    
-                result.append('{} {} {}'.format(func, arg, str(skip)).strip())
+                result.append([func, arg, str(skip)])
                 self.__translate(block, result, arg)
             elif func == 'else':
                 skip = self.__get_if_block_length(block)
-                result.append('if !{} {}'.format(entry_condition, str(skip)).strip())
+                result.append(['if', '!{}'.format(entry_condition), str(skip)])
                 self.__translate(block, result)
                 return result
             else:
                 count = int(arg) if arg <> '' else 1
                 for _ in range(count):
-                    result.append((func).strip())
+                    result.append([func.strip()])
                     
         return result
                     
