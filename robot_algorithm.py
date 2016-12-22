@@ -93,7 +93,7 @@ class RobotAlgorithm:
                     
     def __get_if_block_length(self, block):
         section = list(reversed(block))
-        ifs = []
+        ifs = 0
         skip = 0
         ends = 0
         repeats = 0
@@ -102,18 +102,18 @@ class RobotAlgorithm:
             inner_cmd = inner[0]
             
             if inner_cmd == 'if':
-                ifs.insert(0, True)
+                ifs += 1
             elif inner_cmd == 'end':
-                if not ifs:
+                if ifs == 0:
                     break
                 
                 ends += 1    
-                ifs.pop()
+                ifs -= 1
             elif inner_cmd == 'else':
-                if not ifs:
+                if ifs == 0:
                     break
                 
-                ifs.pop()
+                ifs -= 1
             elif len(inner) > 1:
                 inner_arg = inner[1]
                 repeats += (int(inner_arg) - 1)
