@@ -5,7 +5,7 @@ class RobotAlgorithm:
         commands = self.__to_commands_list(raw_program)
         stack = self.__to_stack(commands)
         
-        self.program = self.__translate(stack, [])
+        self.program = self.__translate(stack)
         
         self.i = 0
         
@@ -70,7 +70,7 @@ class RobotAlgorithm:
                             
         return False    
             
-    def __translate(self, block, result, entry_condition=None):
+    def __translate(self, block, result=[], entry_condition=None):
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
             func = statement[0]
