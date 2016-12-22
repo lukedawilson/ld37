@@ -58,10 +58,10 @@ def assert_are_equal(expected, actual):
 def test_basic_commands():
     # Arange
     input = """
-    rl
+    RL
     rr
-    fd
-    sh
+    FD
+    Sh
     """
     robot = Sprite()
     algo = RobotAlgorithm(robot, input)

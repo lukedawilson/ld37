@@ -131,4 +131,4 @@ class RobotAlgorithm:
         return list(reversed(collection))
         
     def __to_commands_list(self, raw_program):
-        return list(filter(None, map(lambda x: x.strip(), raw_program.split('\n'))))
+        return list(filter(None, map(lambda x: x.strip().lower(), raw_program.split('\n'))))
