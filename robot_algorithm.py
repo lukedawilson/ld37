@@ -70,7 +70,10 @@ class RobotAlgorithm:
                             
         return False    
             
-    def __translate(self, block, result=[], entry_condition=None):
+    def __translate(self, block, result=None, entry_condition=None):
+        if not result:
+            result = []
+        
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
             func = statement[0]
