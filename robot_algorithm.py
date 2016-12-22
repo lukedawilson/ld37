@@ -83,7 +83,7 @@ class RobotAlgorithm:
         while len(block) > 0:
             statement = filter(None, block.pop().split(' '))
             func = statement[0]
-            arg = statement[1] if len(statement) > 1 else ''
+            arg = statement[1] if len(statement) > 1 else None
             
             if func == 'end':
                 return result
@@ -98,7 +98,7 @@ class RobotAlgorithm:
                 return result
             else:
                 try:
-                    count = int(arg) if arg <> '' else 1
+                    count = int(arg) if arg else 1
                 except ValueError:
                     raise RobotRuntimeException('Invalid argument - {}. Expected argument of type int.'.format(arg))
                     
