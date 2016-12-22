@@ -5,7 +5,7 @@ class RobotAlgorithm:
         commands = self.__to_commands_list(raw_program)
         stack = self.__to_stack(commands)
         
-        self.program = self.__translate(list(stack), [])
+        self.program = self.__translate(stack, [])
         
         self.i = 0
         
