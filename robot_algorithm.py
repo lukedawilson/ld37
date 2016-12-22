@@ -1,3 +1,8 @@
+class RobotRuntimeException(BaseException):
+    """
+    Generic runtime exception for game interpreter
+    """
+
 class RobotAlgorithm:
     def __init__(self, robot, raw_program):
         self.robot = robot
@@ -67,7 +72,7 @@ class RobotAlgorithm:
         if condition == 'wf':
             return self.robot.wall_front() == value
                             
-        return False    
+        raise RobotRuntimeException('Unknown condition - {}'.format(condition)) #TODO implement derived exception
             
     def __translate(self, block, result=None, entry_condition=None):
         if not result:

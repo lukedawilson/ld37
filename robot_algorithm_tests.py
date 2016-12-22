@@ -1,4 +1,4 @@
-from robot_algorithm import RobotAlgorithm
+from robot_algorithm import RobotAlgorithm, RobotRuntimeException
 import inspect
 
 class Sprite:
@@ -252,6 +252,25 @@ def test_nested_if_else(left, right, forward, expected):
         
     assert_are_equal(expected, robot.get_commands())
 
+def test_bad_if_condition():
+    # Arrange
+    input = """
+    if foo
+        rl
+    end
+    """
+    robot = Sprite()
+    algo = RobotAlgorithm(robot, input)
+    
+    # Act
+    try:
+        for _ in range(3):
+            algo.run_next_command()
+    except RobotRuntimeException:
+        caught = True
+        
+    assert_are_equal(True, caught)
+ 
 test_basic_commands()
 test_repeat_arg()
 test_if()
@@ -262,3 +281,4 @@ test_if_else()
 test_nested_if_else(True, True, True, ['mv 1', 'r -90', 'sh 15', 'sh 15', 'mv 1'])
 test_nested_if_else(False, True, True, ['mv 1', 'r 90', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
 test_nested_if_else(False, False, True, ['mv 1', 'sh 15', 'sh 15', 'sh 15', 'sh 15', 'mv 1'])
+test_bad_if_condition()
