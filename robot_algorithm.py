@@ -36,7 +36,7 @@ class RobotAlgorithm:
             statement = self.program[self.current_step]
             cmd = statement[0]
             arg = statement[1] if len(statement) > 1 else ''     
-            skip = int(statement[2]) if len(statement) > 2 else 0
+            skip = statement[2] if len(statement) > 2 else 0
             
         if cmd == 'rl':
             self.robot.rotate(-90)
