@@ -18,14 +18,14 @@ class RobotAlgorithm:
         if len(self.program) == 0:
             return
 
-        if self.i >= len(self.program):
-            self.i = 0   
+        if self.current_step >= len(self.program):
+            self.current_step = 0   
     
         statement = self.program[self.current_step]
         cmd = statement[0]
         arg = statement[1] if len(statement) > 1 else ''     
         skip = statement[2] if len(statement) > 2 else 0
-        
+
         while cmd == 'if':
             self.current_step += 1
             
@@ -34,14 +34,14 @@ class RobotAlgorithm:
                 self.current_step += skip
                 
             if self.current_step >= len(self.program):
-                cmd = None
-                break
+                self.run_next_command()
+                return
                 
             statement = self.program[self.current_step]
             cmd = statement[0]
             arg = statement[1] if len(statement) > 1 else ''     
             skip = statement[2] if len(statement) > 2 else 0
-            
+
         if cmd == 'rl':
             self.robot.rotate(-90)
         elif cmd == 'rr':
@@ -112,7 +112,7 @@ class RobotAlgorithm:
         ifs = 0
         ends = 0
         repeats = 0
-        for i in range(0, len(section) - 1):
+        for i in range(0, len(section)):
             inner = filter(None, section[i].split(' '))
             inner_cmd = inner[0]
             
@@ -136,7 +136,7 @@ class RobotAlgorithm:
                     repeats += (int(inner_arg) - 1)
                 except ValueError:
                     raise RobotRuntimeException('Invalid argument - {}. Expected argument of type int.'.format(inner_arg))
-   
+
         return i - ends + repeats
     
     def __stack_to_list(self, stack):

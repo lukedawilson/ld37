@@ -61,11 +61,45 @@ def test_basic_commands():
     algo = RobotAlgorithm(robot, input)
 
     # Act
-    for _ in range(4):    
+    for _ in range(5):    
         algo.run_next_command()
     
     #Assert
-    assert_are_equal(['r -90', 'r 90', 'mv 1', 'sh 15'], robot.get_commands())
+    assert_are_equal(['r -90', 'r 90', 'mv 1', 'sh 15', 'r -90'], robot.get_commands())
+
+def test_empty_program():
+    # Arange
+    input = """
+    
+    """
+    robot = Sprite(left = False)
+    algo = RobotAlgorithm(robot, input)
+
+    # Act
+    for _ in range(5):    
+        algo.run_next_command()
+    
+    #Assert
+    assert_are_equal([], robot.get_commands())
+
+def test_off_by_one_bug():
+    # Arange
+    input = """
+    fd
+    if el
+        rl
+        sh
+    end
+    """
+    robot = Sprite(left = False)
+    algo = RobotAlgorithm(robot, input)
+
+    # Act
+    for _ in range(5):    
+        algo.run_next_command()
+    
+    #Assert
+    assert_are_equal(['mv 1', 'mv 1', 'mv 1', 'mv 1', 'mv 1'], robot.get_commands())
     
 def test_repeat_arg():
     # Arrange
@@ -213,10 +247,10 @@ def test_if_else():
     algo = RobotAlgorithm(robot, input)
     
     # Act
-    for _ in range(6):
+    for _ in range(8):
         algo.run_next_command()
         
-    assert_are_equal(['mv 1', 'r 90', 'mv 1', 'sh 15', 'mv 1', 'sh 15'], robot.get_commands())
+    assert_are_equal(['mv 1', 'r 90', 'mv 1', 'sh 15', 'mv 1', 'sh 15', 'mv 1', 'r 90'], robot.get_commands())
     
 def test_nested_if_else(left, right, forward, expected):
     # Arrange
@@ -320,6 +354,8 @@ def test_bad_nested_arg():
     assert_are_equal(True, caught)    
  
 test_basic_commands()
+test_empty_program()
+test_off_by_one_bug()
 test_repeat_arg()
 test_if()
 test_nested_if()
