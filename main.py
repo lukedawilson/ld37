@@ -86,6 +86,7 @@ else
 end
 """
 
+INDENT_TABS = 2
 
 def die(level):
     message_to_screen('GAME OVER', red, y_displace=-75, size='large')
@@ -268,14 +269,14 @@ def program_input(text):
             elif event.type == KEYDOWN:
                 if event.key == K_RETURN:
                     text = text[:cursor_pos] + '\n' + tabs(text[:cursor_pos]) * '    ' + text[cursor_pos:]
-                    cursor_pos += tabs(text) * 4 + 1
+                    cursor_pos += tabs(text) * INDENT_TABS + 1
                 elif event.key == K_BACKSPACE:
                     if cursor_pos > 0:
                         text = text[:cursor_pos-1] + text[cursor_pos:]
                         cursor_pos -= 1
                 elif event.key == K_TAB:
                     text = text[:cursor_pos] + '    ' + text[cursor_pos:]
-                    cursor_pos += 4
+                    cursor_pos += INDENT_TABS
                 elif event.key == K_LEFT:
                     cursor_pos -= 1
                 elif event.key == K_RIGHT:
